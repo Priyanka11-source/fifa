@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "GenAI Smart Stadium"
+version = "1.0.0"
+id = "artifacts/smart-stadium"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22416
+
+[services.development]
+run = "pnpm --filter @workspace/smart-stadium run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/smart-stadium", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/smart-stadium/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22416"
+BASE_PATH = "/"
