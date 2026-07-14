@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: genai
+    description: GenAI-powered stadium operations and fan assistance
 paths:
   /healthz:
     get:
@@ -24,6 +26,69 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /genai/operations/state:
+    get:
+      operationId: getOperationsState
+      tags: [genai]
+      summary: Get live simulated stadium operational state
+      description: Returns current simulated gate crowd levels, transport status, weather, and energy load. Values drift slightly on every call to simulate live sensor telemetry.
+      responses:
+        "200":
+          description: Current operational state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationalState"
+  /genai/operations/brief:
+    post:
+      operationId: generateOperationsBrief
+      tags: [genai]
+      summary: Generate a GenAI operational intelligence brief from the current live state
+      description: Sends the current simulated operational state to a GenAI model and returns a structured set of prioritized operational directives (crowd, accessibility, transport, sustainability, security) plus a short human-readable summary.
+      responses:
+        "200":
+          description: Generated operations brief
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationsBrief"
+        "502":
+          description: GenAI generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenaiError"
+  /genai/concierge/messages:
+    post:
+      operationId: sendConciergeMessage
+      tags: [genai]
+      summary: Send a message to the multilingual GenAI fan concierge
+      description: Detects the input language, translates it to English, classifies the intent (navigation, accessibility, transportation, ticketing, general), and returns a helpful concierge reply in the fan's original language plus an English translation of that reply.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConciergeMessageInput"
+      responses:
+        "200":
+          description: Concierge reply
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConciergeMessageOutput"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenaiError"
+        "502":
+          description: GenAI generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenaiError"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +98,127 @@ components:
           type: string
       required:
         - status
+    GenaiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    GateStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        crowdPct:
+          type: number
+        status:
+          type: string
+          enum: [clear, moderate, congested, critical]
+      required: [id, name, crowdPct, status]
+    TransportLine:
+      type: object
+      properties:
+        name:
+          type: string
+        mode:
+          type: string
+          enum: [rail, shuttle, rideshare, parking]
+        status:
+          type: string
+          enum: [normal, delayed, disrupted]
+        etaMinutes:
+          type: integer
+      required: [name, mode, status, etaMinutes]
+    OperationalState:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        weatherCondition:
+          type: string
+        energyLoadPct:
+          type: number
+        crowdCount:
+          type: integer
+        gates:
+          type: array
+          items:
+            $ref: "#/components/schemas/GateStatus"
+        transport:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransportLine"
+      required:
+        - timestamp
+        - weatherCondition
+        - energyLoadPct
+        - crowdCount
+        - gates
+        - transport
+    Directive:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        category:
+          type: string
+          enum: [crowd, accessibility, transport, sustainability, security, ticketing]
+        severity:
+          type: string
+          enum: [info, watch, critical]
+        gate:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [executing, monitoring, resolved]
+      required: [id, title, detail, category, severity, gate, status]
+    OperationsBrief:
+      type: object
+      properties:
+        summary:
+          type: string
+        generatedAt:
+          type: string
+          format: date-time
+        directives:
+          type: array
+          items:
+            $ref: "#/components/schemas/Directive"
+      required: [summary, generatedAt, directives]
+    ConciergeMessageInput:
+      type: object
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 500
+      required: [message]
+    ConciergeMessageOutput:
+      type: object
+      properties:
+        detectedLanguage:
+          type: string
+        translatedMessage:
+          type: string
+        reply:
+          type: string
+        replyTranslation:
+          type: string
+        category:
+          type: string
+          enum: [navigation, accessibility, transportation, ticketing, general]
+      required:
+        - detectedLanguage
+        - translatedMessage
+        - reply
+        - replyTranslation
+        - category
 
