@@ -1,0 +1,1 @@
+- [No-LLM-key fallback](no-llm-key-fallback.md) — when a user has no working LLM key, build "AI features" as deterministic logic over live state, not static mocks.

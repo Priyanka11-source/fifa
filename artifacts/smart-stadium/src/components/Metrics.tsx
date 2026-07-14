@@ -1,14 +1,37 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-
-const METRICS = [
-  { label: 'Energy Load', value: '42', unit: 'MW', sub: 'Optimized -14%', trend: 'down' },
-  { label: 'Gate Throughput', value: '1.2', unit: 'k/min', sub: 'Peak flow active', trend: 'up' },
-  { label: 'Acoustic Resonance', value: '114', unit: 'dB', sub: 'Safe threshold', trend: 'stable' },
-  { label: 'Carbon Offset', value: '8.4', unit: 't', sub: 'Matchday total', trend: 'up' }
-];
+import { useGetOperationsState, getGetOperationsStateQueryKey } from '@workspace/api-client-react';
 
 export default function Metrics() {
+  const { data: state } = useGetOperationsState({
+    query: { queryKey: getGetOperationsStateQueryKey(), refetchInterval: 5000 },
+  });
+
+  const METRICS = [
+    {
+      label: 'Energy Load',
+      value: state ? String(state.energyLoadPct) : '—',
+      unit: '%',
+      sub: state && state.energyLoadPct >= 80 ? 'Load-shedding active' : 'Within target',
+      trend: state && state.energyLoadPct >= 80 ? 'up' : 'down',
+    },
+    {
+      label: 'Fans On Site',
+      value: state ? (state.crowdCount / 1000).toFixed(1) : '—',
+      unit: 'k',
+      sub: 'Live headcount estimate',
+      trend: 'up',
+    },
+    {
+      label: 'Transport Health',
+      value: state ? String(state.transport.filter((t) => t.status === 'normal').length) : '—',
+      unit: `/ ${state?.transport.length ?? 4} on time`,
+      sub: state ? state.weatherCondition : 'Loading…',
+      trend: 'stable',
+    },
+    { label: 'Carbon Offset', value: '8.4', unit: 't', sub: 'Matchday total', trend: 'up' as const }
+  ];
+
   return (
     <section className="relative w-full py-32 bg-background overflow-hidden border-t border-primary/10">
       {/* Decorative Video Background for depth */}
