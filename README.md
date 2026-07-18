@@ -71,3 +71,20 @@ Rather than building a standard corporate dashboard, the UI is treated like a hi
    ```bash
    pnpm run typecheck
    ```
+
+---
+
+## ⚡ Vercel Deployment
+
+Since this project is managed as a `pnpm` monorepo, follow these steps to host the frontend on **Vercel**:
+
+1. Log in to the [Vercel Dashboard](https://vercel.com) and click **Add New > Project**.
+2. Import the public GitHub repository: **`Priyanka11-source/fifa`**.
+3. In the project configure settings:
+   - **Framework Preset**: Select **`Vite`**.
+   - **Root Directory**: Select **`artifacts/smart-stadium`**.
+   - **Build Command**: Set to `pnpm run build` (or leave as default, Vercel automatically runs the build).
+   - **Output Directory**: Vercel will build into `dist/public` based on the Vite config. Set the output directory override to **`dist/public`** if prompted.
+4. Add any required environment variables (e.g. `GEMINI_API_KEY` for vision scanning and translation support).
+5. Click **Deploy**!
+
