@@ -58,6 +58,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GenaiError"
+  /genai/operations/simulate:
+    post:
+      operationId: simulateIncident
+      tags: [genai]
+      summary: Simulate a stadium incident
+      description: Sets the active simulated incident, which overrides the live telemetry and shifts the stadium into emergency operational state.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulateIncidentBody"
+      responses:
+        "200":
+          description: Simulation activated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required: [status]
+  /genai/operations/reset:
+    post:
+      operationId: resetIncident
+      tags: [genai]
+      summary: Reset stadium simulation
+      description: Clears any active incident and restores normal simulated operations.
+      responses:
+        "200":
+          description: Simulation reset completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required: [status]
   /genai/concierge/messages:
     post:
       operationId: sendConciergeMessage
@@ -144,6 +184,9 @@ components:
           type: number
         crowdCount:
           type: integer
+        activeIncident:
+          type: string
+          enum: [none, storm, transit_disruption, crowd_surge, grid_failure]
         gates:
           type: array
           items:
@@ -157,6 +200,7 @@ components:
         - weatherCondition
         - energyLoadPct
         - crowdCount
+        - activeIncident
         - gates
         - transport
     Directive:
@@ -221,4 +265,11 @@ components:
         - reply
         - replyTranslation
         - category
+    SimulateIncidentBody:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [none, storm, transit_disruption, crowd_surge, grid_failure]
+      required: [type]
 

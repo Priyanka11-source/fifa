@@ -25,7 +25,10 @@ import type {
   GenaiError,
   HealthStatus,
   OperationalState,
-  OperationsBrief
+  OperationsBrief,
+  ResetIncident200,
+  SimulateIncident200,
+  SimulateIncidentBody
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -281,6 +284,150 @@ export const useGenerateOperationsBrief = <TError = ErrorType<GenaiError>,
         TContext
       > => {
       return useMutation(getGenerateOperationsBriefMutationOptions(options));
+    }
+
+export const getSimulateIncidentUrl = () => {
+
+
+
+
+  return `/api/genai/operations/simulate`
+}
+
+/**
+ * Sets the active simulated incident, which overrides the live telemetry and shifts the stadium into emergency operational state.
+ * @summary Simulate a stadium incident
+ */
+export const simulateIncident = async (simulateIncidentBody: SimulateIncidentBody, options?: RequestInit): Promise<SimulateIncident200> => {
+
+  return customFetch<SimulateIncident200>(getSimulateIncidentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(simulateIncidentBody)
+  }
+);}
+
+
+
+
+
+export const getSimulateIncidentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simulateIncident>>, TError,{data: BodyType<SimulateIncidentBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof simulateIncident>>, TError,{data: BodyType<SimulateIncidentBody>}, TContext> => {
+
+const mutationKey = ['simulateIncident'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof simulateIncident>>, {data: BodyType<SimulateIncidentBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  simulateIncident(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SimulateIncidentMutationResult = NonNullable<Awaited<ReturnType<typeof simulateIncident>>>
+    export type SimulateIncidentMutationBody = BodyType<SimulateIncidentBody>
+    export type SimulateIncidentMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Simulate a stadium incident
+ */
+export const useSimulateIncident = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simulateIncident>>, TError,{data: BodyType<SimulateIncidentBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof simulateIncident>>,
+        TError,
+        {data: BodyType<SimulateIncidentBody>},
+        TContext
+      > => {
+      return useMutation(getSimulateIncidentMutationOptions(options));
+    }
+
+export const getResetIncidentUrl = () => {
+
+
+
+
+  return `/api/genai/operations/reset`
+}
+
+/**
+ * Clears any active incident and restores normal simulated operations.
+ * @summary Reset stadium simulation
+ */
+export const resetIncident = async ( options?: RequestInit): Promise<ResetIncident200> => {
+
+  return customFetch<ResetIncident200>(getResetIncidentUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getResetIncidentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIncident>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resetIncident>>, TError,void, TContext> => {
+
+const mutationKey = ['resetIncident'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetIncident>>, void> = () => {
+
+
+          return  resetIncident(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResetIncidentMutationResult = NonNullable<Awaited<ReturnType<typeof resetIncident>>>
+
+    export type ResetIncidentMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Reset stadium simulation
+ */
+export const useResetIncident = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIncident>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof resetIncident>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getResetIncidentMutationOptions(options));
     }
 
 export const getSendConciergeMessageUrl = () => {

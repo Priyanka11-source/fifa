@@ -56,11 +56,23 @@ export interface TransportLine {
   etaMinutes: number;
 }
 
+export type OperationalStateActiveIncident = typeof OperationalStateActiveIncident[keyof typeof OperationalStateActiveIncident];
+
+
+export const OperationalStateActiveIncident = {
+  none: 'none',
+  storm: 'storm',
+  transit_disruption: 'transit_disruption',
+  crowd_surge: 'crowd_surge',
+  grid_failure: 'grid_failure',
+} as const;
+
 export interface OperationalState {
   timestamp: string;
   weatherCondition: string;
   energyLoadPct: number;
   crowdCount: number;
+  activeIncident: OperationalStateActiveIncident;
   gates: GateStatus[];
   transport: TransportLine[];
 }
@@ -138,4 +150,27 @@ export interface ConciergeMessageOutput {
   replyTranslation: string;
   category: ConciergeMessageOutputCategory;
 }
+
+export type SimulateIncidentBodyType = typeof SimulateIncidentBodyType[keyof typeof SimulateIncidentBodyType];
+
+
+export const SimulateIncidentBodyType = {
+  none: 'none',
+  storm: 'storm',
+  transit_disruption: 'transit_disruption',
+  crowd_surge: 'crowd_surge',
+  grid_failure: 'grid_failure',
+} as const;
+
+export interface SimulateIncidentBody {
+  type: SimulateIncidentBodyType;
+}
+
+export type SimulateIncident200 = {
+  status: string;
+};
+
+export type ResetIncident200 = {
+  status: string;
+};
 

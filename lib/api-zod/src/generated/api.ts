@@ -26,6 +26,7 @@ export const GetOperationsStateResponse = zod.object({
   "weatherCondition": zod.string(),
   "energyLoadPct": zod.number(),
   "crowdCount": zod.number(),
+  "activeIncident": zod.enum(['none', 'storm', 'transit_disruption', 'crowd_surge', 'grid_failure']),
   "gates": zod.array(zod.object({
   "id": zod.string(),
   "name": zod.string(),
@@ -57,6 +58,28 @@ export const GenerateOperationsBriefResponse = zod.object({
   "gate": zod.string().nullable(),
   "status": zod.enum(['executing', 'monitoring', 'resolved'])
 }))
+})
+
+
+/**
+ * Sets the active simulated incident, which overrides the live telemetry and shifts the stadium into emergency operational state.
+ * @summary Simulate a stadium incident
+ */
+export const SimulateIncidentBody = zod.object({
+  "type": zod.enum(['none', 'storm', 'transit_disruption', 'crowd_surge', 'grid_failure'])
+})
+
+export const SimulateIncidentResponse = zod.object({
+  "status": zod.string()
+})
+
+
+/**
+ * Clears any active incident and restores normal simulated operations.
+ * @summary Reset stadium simulation
+ */
+export const ResetIncidentResponse = zod.object({
+  "status": zod.string()
 })
 
 

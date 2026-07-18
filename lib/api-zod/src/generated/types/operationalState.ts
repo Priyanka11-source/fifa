@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { GateStatus } from './gateStatus';
+import type { OperationalStateActiveIncident } from './operationalStateActiveIncident';
 import type { TransportLine } from './transportLine';
 
 export interface OperationalState {
@@ -13,6 +14,7 @@ export interface OperationalState {
   weatherCondition: string;
   energyLoadPct: number;
   crowdCount: number;
+  activeIncident: OperationalStateActiveIncident;
   gates: GateStatus[];
   transport: TransportLine[];
 }
