@@ -8,8 +8,9 @@ out-tsc
 .expo
 .expo-shared
 
-# dependencies
 node_modules
+**/node_modules
+**/dist
 
 # IDEs and editors
 /.idea
@@ -47,3 +48,5 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+.vercel
