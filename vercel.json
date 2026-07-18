@@ -1,0 +1,4 @@
+{
+  "buildCommand": "pnpm --filter @workspace/smart-stadium run build",
+  "outputDirectory": "artifacts/smart-stadium/dist/public"
+}
