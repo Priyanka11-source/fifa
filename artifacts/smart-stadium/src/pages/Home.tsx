@@ -31,7 +31,7 @@ function SectionWrapper({
   title?: string;
 }) {
   return (
-    <section id={id} className="w-full max-w-7xl mx-auto px-6 py-5 relative z-10">
+    <section id={id} className="w-full max-w-7xl mx-auto px-6 py-5 relative z-10 scroll-mt-24">
       <div className={`glass-panel p-6 md:p-8 rounded-sm border-t-2 ${borderColor} ${shadowClass} ${hoverClass} transition-all duration-500`}>
         {(label || title) && (
           <div className="mb-6">

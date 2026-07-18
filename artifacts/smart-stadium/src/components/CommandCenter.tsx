@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -43,6 +43,8 @@ export default function CommandCenter() {
   
   const [directives, setDirectives] = useState<Directive[]>([]);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
+  
+  const terminalEndRef = useRef<HTMLDivElement>(null);
 
   // Custom manual telemetry states
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -76,6 +78,12 @@ export default function CommandCenter() {
       setDirectives(brief.directives);
     }
   }, [brief]);
+
+  useEffect(() => {
+    if (terminalEndRef.current) {
+      terminalEndRef.current.scrollTop = terminalEndRef.current.scrollHeight;
+    }
+  }, [state, directives]);
 
   async function handleCustomSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -391,7 +399,10 @@ export default function CommandCenter() {
               )}
 
               {/* Log message output */}
-              <div className="flex flex-col gap-3 font-mono text-[11px] text-foreground/75 leading-relaxed bg-black/60 border border-primary/10 p-4 rounded-sm min-h-[160px] max-h-[220px] overflow-y-auto">
+              <div 
+                ref={terminalEndRef}
+                className="flex flex-col gap-3 font-mono text-[11px] text-foreground/75 leading-relaxed bg-black/60 border border-primary/10 p-4 rounded-sm min-h-[160px] max-h-[220px] overflow-y-auto"
+              >
                 <p className="text-primary/70">{`>>> Initializing Neural Link... OK`}</p>
                 <p className="text-primary/70">{`>>> Telemetry refresh: 2000ms...`}</p>
                 {state?.activeIncident !== 'none' ? (
