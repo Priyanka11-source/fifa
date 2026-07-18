@@ -1,6 +1,8 @@
 .git
 .replit
 .gemini
+.local
+.cache
 node_modules
 artifacts/smart-stadium/node_modules
 artifacts/api-server/node_modules
