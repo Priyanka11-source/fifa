@@ -6,13 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type SimulateIncidentBodyType = typeof SimulateIncidentBodyType[keyof typeof SimulateIncidentBodyType];
-
+export type SimulateIncidentBodyType =
+  (typeof SimulateIncidentBodyType)[keyof typeof SimulateIncidentBodyType];
 
 export const SimulateIncidentBodyType = {
-  none: 'none',
-  storm: 'storm',
-  transit_disruption: 'transit_disruption',
-  crowd_surge: 'crowd_surge',
-  grid_failure: 'grid_failure',
+  none: "none",
+  storm: "storm",
+  transit_disruption: "transit_disruption",
+  crowd_surge: "crowd_surge",
+  grid_failure: "grid_failure",
 } as const;

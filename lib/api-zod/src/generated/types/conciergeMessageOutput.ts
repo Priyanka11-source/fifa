@@ -5,7 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { ConciergeMessageOutputCategory } from './conciergeMessageOutputCategory';
+import type { ConciergeMessageOutputCategory } from "./conciergeMessageOutputCategory";
 
 export interface ConciergeMessageOutput {
   detectedLanguage: string;

@@ -6,7 +6,13 @@ import {
   SendConciergeMessageResponse,
   UpdateCustomTelemetryBody,
 } from "@workspace/api-zod";
-import { getOperationalState, setActiveIncident, resetActiveIncident, updateOperationalState, type IncidentType } from "../lib/operationsState";
+import {
+  getOperationalState,
+  setActiveIncident,
+  resetActiveIncident,
+  updateOperationalState,
+  type IncidentType,
+} from "../lib/operationsState";
 import { buildOperationsBrief } from "../lib/operationsBrief";
 import {
   detectLanguage,
@@ -36,7 +42,16 @@ router.post("/genai/operations/brief", (req, res): void => {
 router.post("/genai/operations/simulate", (req, res): void => {
   try {
     const { type } = req.body as { type: IncidentType };
-    if (!type || !["none", "storm", "transit_disruption", "crowd_surge", "grid_failure"].includes(type)) {
+    if (
+      !type ||
+      ![
+        "none",
+        "storm",
+        "transit_disruption",
+        "crowd_surge",
+        "grid_failure",
+      ].includes(type)
+    ) {
       res.status(400).json({ error: "Invalid incident type" });
       return;
     }
@@ -85,7 +100,11 @@ router.post("/genai/concierge/messages", (req, res): void => {
     const state = getOperationalState();
     const { code, name } = detectLanguage(parsed.data.message);
     const category = detectCategory(parsed.data.message);
-    const { reply, replyTranslation } = buildConciergeReply(code, category, state);
+    const { reply, replyTranslation } = buildConciergeReply(
+      code,
+      category,
+      state,
+    );
 
     const output = SendConciergeMessageResponse.parse({
       detectedLanguage: name,
@@ -120,10 +139,10 @@ router.post("/genai/scan-webcam", async (req, res): Promise<void> => {
         res.json({
           success: true,
           type: isLikelyTicket ? "ticket" : "face",
-          message: isLikelyTicket 
+          message: isLikelyTicket
             ? "Gemini Vision verified pass: Valid FIFA 2026 QR Matchday Pass detected. Access granted."
             : "Gemini Vision verified face: Biometric scan authenticated successfully. Access granted.",
-          details: "Emulator fallback active."
+          details: "Emulator fallback active.",
         });
       }, 1000);
       return;
@@ -139,30 +158,33 @@ router.post("/genai/scan-webcam", async (req, res): Promise<void> => {
             {
               parts: [
                 {
-                  text: "Analyze this image from a gate security camera. If it contains a human face, return JSON: { \"success\": true, \"type\": \"face\", \"message\": \"Face match verified. Access granted.\" }. If it contains a ticket, QR code, or paper pass, return JSON: { \"success\": true, \"type\": \"ticket\", \"message\": \"Valid Match Ticket verified. Access granted.\" }. Otherwise, return: { \"success\": false, \"type\": \"unknown\", \"message\": \"Unable to recognize. Please present your ticket or look at the scanner.\" }."
+                  text: 'Analyze this image from a gate security camera. If it contains a human face, return JSON: { "success": true, "type": "face", "message": "Face match verified. Access granted." }. If it contains a ticket, QR code, or paper pass, return JSON: { "success": true, "type": "ticket", "message": "Valid Match Ticket verified. Access granted." }. Otherwise, return: { "success": false, "type": "unknown", "message": "Unable to recognize. Please present your ticket or look at the scanner." }.',
                 },
                 {
                   inlineData: {
                     mimeType: "image/jpeg",
-                    data: base64Data
-                  }
-                }
-              ]
-            }
+                    data: base64Data,
+                  },
+                },
+              ],
+            },
           ],
           generationConfig: {
-            responseMimeType: "application/json"
-          }
-        })
-      }
+            responseMimeType: "application/json",
+          },
+        }),
+      },
     );
 
     const result = (await response.json()) as any;
-    const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const responseText =
+      result.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     res.json(JSON.parse(responseText.trim()));
   } catch (err) {
     req.log.error({ err }, "Gemini scanning failed");
-    res.status(500).json({ error: "Gemini ticket scanner vision analysis failed" });
+    res
+      .status(500)
+      .json({ error: "Gemini ticket scanner vision analysis failed" });
   }
 });
 

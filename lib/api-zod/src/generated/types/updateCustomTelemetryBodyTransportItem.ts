@@ -5,7 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { UpdateCustomTelemetryBodyTransportItemStatus } from './updateCustomTelemetryBodyTransportItemStatus';
+import type { UpdateCustomTelemetryBodyTransportItemStatus } from "./updateCustomTelemetryBodyTransportItemStatus";
 
 export type UpdateCustomTelemetryBodyTransportItem = {
   name: string;

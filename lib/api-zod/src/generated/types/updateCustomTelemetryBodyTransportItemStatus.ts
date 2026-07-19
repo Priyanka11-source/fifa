@@ -6,11 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type UpdateCustomTelemetryBodyTransportItemStatus = typeof UpdateCustomTelemetryBodyTransportItemStatus[keyof typeof UpdateCustomTelemetryBodyTransportItemStatus];
-
+export type UpdateCustomTelemetryBodyTransportItemStatus =
+  (typeof UpdateCustomTelemetryBodyTransportItemStatus)[keyof typeof UpdateCustomTelemetryBodyTransportItemStatus];
 
 export const UpdateCustomTelemetryBodyTransportItemStatus = {
-  normal: 'normal',
-  delayed: 'delayed',
-  disrupted: 'disrupted',
+  normal: "normal",
+  delayed: "delayed",
+  disrupted: "disrupted",
 } as const;

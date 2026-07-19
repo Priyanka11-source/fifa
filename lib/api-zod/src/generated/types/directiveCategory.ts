@@ -6,14 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type DirectiveCategory = typeof DirectiveCategory[keyof typeof DirectiveCategory];
-
+export type DirectiveCategory =
+  (typeof DirectiveCategory)[keyof typeof DirectiveCategory];
 
 export const DirectiveCategory = {
-  crowd: 'crowd',
-  accessibility: 'accessibility',
-  transport: 'transport',
-  sustainability: 'sustainability',
-  security: 'security',
-  ticketing: 'ticketing',
+  crowd: "crowd",
+  accessibility: "accessibility",
+  transport: "transport",
+  sustainability: "sustainability",
+  security: "security",
+  ticketing: "ticketing",
 } as const;

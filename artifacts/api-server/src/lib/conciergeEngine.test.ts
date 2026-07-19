@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { detectLanguage, detectCategory, buildConciergeReply, summarizeIntent } from "./conciergeEngine";
+import {
+  detectLanguage,
+  detectCategory,
+  buildConciergeReply,
+  summarizeIntent,
+} from "./conciergeEngine";
 import type { OperationalStateSnapshot } from "./operationsState";
 
 const mockState: OperationalStateSnapshot = {
@@ -9,13 +14,33 @@ const mockState: OperationalStateSnapshot = {
   crowdCount: 15000,
   activeIncident: "none",
   gates: [
-    { id: "gate-1", name: "Gate 1 — North Concourse", crowdPct: 30, status: "clear" },
-    { id: "gate-4", name: "Gate 4 — West Plaza", crowdPct: 80, status: "congested" },
-    { id: "gate-12", name: "Gate 12 — Accessible Entrance", crowdPct: 15, status: "clear" },
+    {
+      id: "gate-1",
+      name: "Gate 1 — North Concourse",
+      crowdPct: 30,
+      status: "clear",
+    },
+    {
+      id: "gate-4",
+      name: "Gate 4 — West Plaza",
+      crowdPct: 80,
+      status: "congested",
+    },
+    {
+      id: "gate-12",
+      name: "Gate 12 — Accessible Entrance",
+      crowdPct: 15,
+      status: "clear",
+    },
   ],
   transport: [
     { name: "Metro Gold Line", mode: "rail", status: "normal", etaMinutes: 5 },
-    { name: "Fan Shuttle Loop A", mode: "shuttle", status: "normal", etaMinutes: 10 },
+    {
+      name: "Fan Shuttle Loop A",
+      mode: "shuttle",
+      status: "normal",
+      etaMinutes: 10,
+    },
   ],
 };
 
@@ -66,7 +91,9 @@ describe("Concierge Intent/Category Detection", () => {
 
   it("should classify transportation intent", () => {
     expect(detectCategory("When is the next shuttle?")).toBe("transportation");
-    expect(detectCategory("Where is metro gold line parking?")).toBe("transportation");
+    expect(detectCategory("Where is metro gold line parking?")).toBe(
+      "transportation",
+    );
   });
 
   it("should classify ticketing intent", () => {
@@ -81,13 +108,21 @@ describe("Concierge Intent/Category Detection", () => {
 
 describe("Concierge Reply Generation & Summarization", () => {
   it("should generate proper english reply for navigation", () => {
-    const { reply, replyTranslation } = buildConciergeReply("en", "navigation", mockState);
+    const { reply, replyTranslation } = buildConciergeReply(
+      "en",
+      "navigation",
+      mockState,
+    );
     expect(reply).toContain("Gate 1"); // quietest gate in mock state
     expect(replyTranslation).toBe(reply);
   });
 
   it("should generate translated reply for Spanish navigation", () => {
-    const { reply, replyTranslation } = buildConciergeReply("es", "navigation", mockState);
+    const { reply, replyTranslation } = buildConciergeReply(
+      "es",
+      "navigation",
+      mockState,
+    );
     expect(reply).toContain("Gate 1");
     expect(replyTranslation).not.toBe(reply);
     expect(replyTranslation).toContain("shortest wait");

@@ -6,12 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TransportLineMode = typeof TransportLineMode[keyof typeof TransportLineMode];
-
+export type TransportLineMode =
+  (typeof TransportLineMode)[keyof typeof TransportLineMode];
 
 export const TransportLineMode = {
-  rail: 'rail',
-  shuttle: 'shuttle',
-  rideshare: 'rideshare',
-  parking: 'parking',
+  rail: "rail",
+  shuttle: "shuttle",
+  rideshare: "rideshare",
+  parking: "parking",
 } as const;

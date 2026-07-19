@@ -6,14 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type UpdateCustomTelemetryBodyActiveIncident = typeof UpdateCustomTelemetryBodyActiveIncident[keyof typeof UpdateCustomTelemetryBodyActiveIncident];
-
+export type UpdateCustomTelemetryBodyActiveIncident =
+  (typeof UpdateCustomTelemetryBodyActiveIncident)[keyof typeof UpdateCustomTelemetryBodyActiveIncident];
 
 export const UpdateCustomTelemetryBodyActiveIncident = {
-  none: 'none',
-  storm: 'storm',
-  transit_disruption: 'transit_disruption',
-  crowd_surge: 'crowd_surge',
-  grid_failure: 'grid_failure',
-  manual: 'manual',
+  none: "none",
+  storm: "storm",
+  transit_disruption: "transit_disruption",
+  crowd_surge: "crowd_surge",
+  grid_failure: "grid_failure",
+  manual: "manual",
 } as const;

@@ -5,9 +5,9 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { GateStatus } from './gateStatus';
-import type { OperationalStateActiveIncident } from './operationalStateActiveIncident';
-import type { TransportLine } from './transportLine';
+import type { GateStatus } from "./gateStatus";
+import type { OperationalStateActiveIncident } from "./operationalStateActiveIncident";
+import type { TransportLine } from "./transportLine";
 
 export interface OperationalState {
   timestamp: Date;

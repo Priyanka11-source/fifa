@@ -26,9 +26,21 @@ export interface OperationalStateSnapshot {
   transport: TransportLineState[];
 }
 
-const WEATHER_CONDITIONS = ["Clear", "Overcast", "Light Rain", "Humid", "Windy"];
+const WEATHER_CONDITIONS = [
+  "Clear",
+  "Overcast",
+  "Light Rain",
+  "Humid",
+  "Windy",
+];
 
-export type IncidentType = "none" | "storm" | "transit_disruption" | "crowd_surge" | "grid_failure" | "manual";
+export type IncidentType =
+  | "none"
+  | "storm"
+  | "transit_disruption"
+  | "crowd_surge"
+  | "grid_failure"
+  | "manual";
 let activeIncident: IncidentType = "none";
 let isManualOverride = false;
 
@@ -60,12 +72,12 @@ export function setActiveIncident(type: IncidentType): void {
       }
     }
   } else if (type === "crowd_surge") {
-    const gate4 = gates.find(g => g.id === "gate-4");
+    const gate4 = gates.find((g) => g.id === "gate-4");
     if (gate4) {
       gate4.crowdPct = 98;
       gate4.status = "critical";
     }
-    const gate14 = gates.find(g => g.id === "gate-14");
+    const gate14 = gates.find((g) => g.id === "gate-14");
     if (gate14) {
       gate14.crowdPct = 92;
       gate14.status = "critical";
@@ -101,7 +113,12 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-function randomWalk(value: number, magnitude: number, min: number, max: number): number {
+function randomWalk(
+  value: number,
+  magnitude: number,
+  min: number,
+  max: number,
+): number {
   const delta = (Math.random() - 0.5) * 2 * magnitude;
   return clamp(value + delta, min, max);
 }
@@ -110,19 +127,64 @@ interface MutableGate extends GateState {}
 interface MutableTransport extends TransportLineState {}
 
 const gates: MutableGate[] = [
-  { id: "gate-1", name: "Gate 1 — North Concourse", crowdPct: 38, status: "moderate" },
-  { id: "gate-4", name: "Gate 4 — West Plaza", crowdPct: 72, status: "congested" },
-  { id: "gate-6", name: "Gate 6 — Family Entrance", crowdPct: 21, status: "clear" },
-  { id: "gate-9", name: "Gate 9 — VIP South", crowdPct: 46, status: "moderate" },
-  { id: "gate-12", name: "Gate 12 — Accessible Entrance", crowdPct: 18, status: "clear" },
-  { id: "gate-14", name: "Gate 14 — East Concourse", crowdPct: 61, status: "moderate" },
+  {
+    id: "gate-1",
+    name: "Gate 1 — North Concourse",
+    crowdPct: 38,
+    status: "moderate",
+  },
+  {
+    id: "gate-4",
+    name: "Gate 4 — West Plaza",
+    crowdPct: 72,
+    status: "congested",
+  },
+  {
+    id: "gate-6",
+    name: "Gate 6 — Family Entrance",
+    crowdPct: 21,
+    status: "clear",
+  },
+  {
+    id: "gate-9",
+    name: "Gate 9 — VIP South",
+    crowdPct: 46,
+    status: "moderate",
+  },
+  {
+    id: "gate-12",
+    name: "Gate 12 — Accessible Entrance",
+    crowdPct: 18,
+    status: "clear",
+  },
+  {
+    id: "gate-14",
+    name: "Gate 14 — East Concourse",
+    crowdPct: 61,
+    status: "moderate",
+  },
 ];
 
 const transport: MutableTransport[] = [
   { name: "Metro Gold Line", mode: "rail", status: "normal", etaMinutes: 4 },
-  { name: "Fan Shuttle Loop A", mode: "shuttle", status: "normal", etaMinutes: 7 },
-  { name: "Rideshare Pickup Zone", mode: "rideshare", status: "delayed", etaMinutes: 12 },
-  { name: "North Parking Structure", mode: "parking", status: "normal", etaMinutes: 0 },
+  {
+    name: "Fan Shuttle Loop A",
+    mode: "shuttle",
+    status: "normal",
+    etaMinutes: 7,
+  },
+  {
+    name: "Rideshare Pickup Zone",
+    mode: "rideshare",
+    status: "delayed",
+    etaMinutes: 12,
+  },
+  {
+    name: "North Parking Structure",
+    mode: "parking",
+    status: "normal",
+    etaMinutes: 0,
+  },
 ];
 
 let weatherCondition = "Clear";
@@ -139,7 +201,10 @@ function tick(): void {
     }
 
     for (const line of transport) {
-      line.etaMinutes = Math.max(0, Math.round(randomWalk(line.etaMinutes, 2, 0, 20)));
+      line.etaMinutes = Math.max(
+        0,
+        Math.round(randomWalk(line.etaMinutes, 2, 0, 20)),
+      );
       if (line.etaMinutes > 14) {
         line.status = "disrupted";
       } else if (line.etaMinutes > 9) {
@@ -153,8 +218,9 @@ function tick(): void {
 
     if (Math.random() < 0.08) {
       weatherCondition =
-        WEATHER_CONDITIONS[Math.floor(Math.random() * WEATHER_CONDITIONS.length)] ??
-        weatherCondition;
+        WEATHER_CONDITIONS[
+          Math.floor(Math.random() * WEATHER_CONDITIONS.length)
+        ] ?? weatherCondition;
     }
   } else {
     // Keep simulation locked to extreme telemetry
@@ -168,9 +234,15 @@ function tick(): void {
       for (const line of transport) {
         if (line.mode === "shuttle" || line.mode === "rideshare") {
           line.status = "delayed";
-          line.etaMinutes = Math.max(14, Math.round(randomWalk(line.etaMinutes, 1, 14, 24)));
+          line.etaMinutes = Math.max(
+            14,
+            Math.round(randomWalk(line.etaMinutes, 1, 14, 24)),
+          );
         } else {
-          line.etaMinutes = Math.max(0, Math.round(randomWalk(line.etaMinutes, 1, 2, 8)));
+          line.etaMinutes = Math.max(
+            0,
+            Math.round(randomWalk(line.etaMinutes, 1, 2, 8)),
+          );
           line.status = "normal";
         }
       }
@@ -178,22 +250,34 @@ function tick(): void {
       for (const line of transport) {
         if (line.mode === "rail") {
           line.status = "disrupted";
-          line.etaMinutes = Math.max(22, Math.round(randomWalk(line.etaMinutes, 1, 22, 30)));
+          line.etaMinutes = Math.max(
+            22,
+            Math.round(randomWalk(line.etaMinutes, 1, 22, 30)),
+          );
         }
       }
     } else if (activeIncident === "crowd_surge") {
-      const gate4 = gates.find(g => g.id === "gate-4");
+      const gate4 = gates.find((g) => g.id === "gate-4");
       if (gate4) {
-        gate4.crowdPct = Math.max(92, Math.round(randomWalk(gate4.crowdPct, 1, 92, 99)));
+        gate4.crowdPct = Math.max(
+          92,
+          Math.round(randomWalk(gate4.crowdPct, 1, 92, 99)),
+        );
         gate4.status = "critical";
       }
-      const gate14 = gates.find(g => g.id === "gate-14");
+      const gate14 = gates.find((g) => g.id === "gate-14");
       if (gate14) {
-        gate14.crowdPct = Math.max(88, Math.round(randomWalk(gate14.crowdPct, 1, 88, 96)));
+        gate14.crowdPct = Math.max(
+          88,
+          Math.round(randomWalk(gate14.crowdPct, 1, 88, 96)),
+        );
         gate14.status = "critical";
       }
     } else if (activeIncident === "grid_failure") {
-      energyLoadPct = Math.max(94, Math.round(randomWalk(energyLoadPct, 1, 94, 99)));
+      energyLoadPct = Math.max(
+        94,
+        Math.round(randomWalk(energyLoadPct, 1, 94, 99)),
+      );
     }
   }
 }
@@ -203,15 +287,20 @@ export function updateOperationalState(data: {
   energyLoadPct?: number;
   activeIncident?: IncidentType;
   gates?: { id: string; crowdPct: number }[];
-  transport?: { name: string; etaMinutes: number; status: TransportStatusValue }[];
+  transport?: {
+    name: string;
+    etaMinutes: number;
+    status: TransportStatusValue;
+  }[];
 }): void {
   isManualOverride = true;
   activeIncident = data.activeIncident ?? "none";
-  if (data.weatherCondition !== undefined) weatherCondition = data.weatherCondition;
+  if (data.weatherCondition !== undefined)
+    weatherCondition = data.weatherCondition;
   if (data.energyLoadPct !== undefined) energyLoadPct = data.energyLoadPct;
   if (data.gates !== undefined) {
     for (const gateInput of data.gates) {
-      const gate = gates.find(g => g.id === gateInput.id);
+      const gate = gates.find((g) => g.id === gateInput.id);
       if (gate) {
         gate.crowdPct = gateInput.crowdPct;
         gate.status = statusForCrowdPct(gate.crowdPct);
@@ -220,7 +309,7 @@ export function updateOperationalState(data: {
   }
   if (data.transport !== undefined) {
     for (const transInput of data.transport) {
-      const line = transport.find(t => t.name === transInput.name);
+      const line = transport.find((t) => t.name === transInput.name);
       if (line) {
         line.etaMinutes = transInput.etaMinutes;
         line.status = transInput.status;

@@ -13,14 +13,14 @@ export interface GenaiError {
   error: string;
 }
 
-export type GateStatusStatus = typeof GateStatusStatus[keyof typeof GateStatusStatus];
-
+export type GateStatusStatus =
+  (typeof GateStatusStatus)[keyof typeof GateStatusStatus];
 
 export const GateStatusStatus = {
-  clear: 'clear',
-  moderate: 'moderate',
-  congested: 'congested',
-  critical: 'critical',
+  clear: "clear",
+  moderate: "moderate",
+  congested: "congested",
+  critical: "critical",
 } as const;
 
 export interface GateStatus {
@@ -30,23 +30,23 @@ export interface GateStatus {
   status: GateStatusStatus;
 }
 
-export type TransportLineMode = typeof TransportLineMode[keyof typeof TransportLineMode];
-
+export type TransportLineMode =
+  (typeof TransportLineMode)[keyof typeof TransportLineMode];
 
 export const TransportLineMode = {
-  rail: 'rail',
-  shuttle: 'shuttle',
-  rideshare: 'rideshare',
-  parking: 'parking',
+  rail: "rail",
+  shuttle: "shuttle",
+  rideshare: "rideshare",
+  parking: "parking",
 } as const;
 
-export type TransportLineStatus = typeof TransportLineStatus[keyof typeof TransportLineStatus];
-
+export type TransportLineStatus =
+  (typeof TransportLineStatus)[keyof typeof TransportLineStatus];
 
 export const TransportLineStatus = {
-  normal: 'normal',
-  delayed: 'delayed',
-  disrupted: 'disrupted',
+  normal: "normal",
+  delayed: "delayed",
+  disrupted: "disrupted",
 } as const;
 
 export interface TransportLine {
@@ -56,15 +56,15 @@ export interface TransportLine {
   etaMinutes: number;
 }
 
-export type OperationalStateActiveIncident = typeof OperationalStateActiveIncident[keyof typeof OperationalStateActiveIncident];
-
+export type OperationalStateActiveIncident =
+  (typeof OperationalStateActiveIncident)[keyof typeof OperationalStateActiveIncident];
 
 export const OperationalStateActiveIncident = {
-  none: 'none',
-  storm: 'storm',
-  transit_disruption: 'transit_disruption',
-  crowd_surge: 'crowd_surge',
-  grid_failure: 'grid_failure',
+  none: "none",
+  storm: "storm",
+  transit_disruption: "transit_disruption",
+  crowd_surge: "crowd_surge",
+  grid_failure: "grid_failure",
 } as const;
 
 export interface OperationalState {
@@ -77,34 +77,34 @@ export interface OperationalState {
   transport: TransportLine[];
 }
 
-export type DirectiveCategory = typeof DirectiveCategory[keyof typeof DirectiveCategory];
-
+export type DirectiveCategory =
+  (typeof DirectiveCategory)[keyof typeof DirectiveCategory];
 
 export const DirectiveCategory = {
-  crowd: 'crowd',
-  accessibility: 'accessibility',
-  transport: 'transport',
-  sustainability: 'sustainability',
-  security: 'security',
-  ticketing: 'ticketing',
+  crowd: "crowd",
+  accessibility: "accessibility",
+  transport: "transport",
+  sustainability: "sustainability",
+  security: "security",
+  ticketing: "ticketing",
 } as const;
 
-export type DirectiveSeverity = typeof DirectiveSeverity[keyof typeof DirectiveSeverity];
-
+export type DirectiveSeverity =
+  (typeof DirectiveSeverity)[keyof typeof DirectiveSeverity];
 
 export const DirectiveSeverity = {
-  info: 'info',
-  watch: 'watch',
-  critical: 'critical',
+  info: "info",
+  watch: "watch",
+  critical: "critical",
 } as const;
 
-export type DirectiveStatus = typeof DirectiveStatus[keyof typeof DirectiveStatus];
-
+export type DirectiveStatus =
+  (typeof DirectiveStatus)[keyof typeof DirectiveStatus];
 
 export const DirectiveStatus = {
-  executing: 'executing',
-  monitoring: 'monitoring',
-  resolved: 'resolved',
+  executing: "executing",
+  monitoring: "monitoring",
+  resolved: "resolved",
 } as const;
 
 export interface Directive {
@@ -126,21 +126,21 @@ export interface OperationsBrief {
 
 export interface ConciergeMessageInput {
   /**
-     * @minLength 1
-     * @maxLength 500
-     */
+   * @minLength 1
+   * @maxLength 500
+   */
   message: string;
 }
 
-export type ConciergeMessageOutputCategory = typeof ConciergeMessageOutputCategory[keyof typeof ConciergeMessageOutputCategory];
-
+export type ConciergeMessageOutputCategory =
+  (typeof ConciergeMessageOutputCategory)[keyof typeof ConciergeMessageOutputCategory];
 
 export const ConciergeMessageOutputCategory = {
-  navigation: 'navigation',
-  accessibility: 'accessibility',
-  transportation: 'transportation',
-  ticketing: 'ticketing',
-  general: 'general',
+  navigation: "navigation",
+  accessibility: "accessibility",
+  transportation: "transportation",
+  ticketing: "ticketing",
+  general: "general",
 } as const;
 
 export interface ConciergeMessageOutput {
@@ -151,31 +151,31 @@ export interface ConciergeMessageOutput {
   category: ConciergeMessageOutputCategory;
 }
 
-export type SimulateIncidentBodyType = typeof SimulateIncidentBodyType[keyof typeof SimulateIncidentBodyType];
-
+export type SimulateIncidentBodyType =
+  (typeof SimulateIncidentBodyType)[keyof typeof SimulateIncidentBodyType];
 
 export const SimulateIncidentBodyType = {
-  none: 'none',
-  storm: 'storm',
-  transit_disruption: 'transit_disruption',
-  crowd_surge: 'crowd_surge',
-  grid_failure: 'grid_failure',
+  none: "none",
+  storm: "storm",
+  transit_disruption: "transit_disruption",
+  crowd_surge: "crowd_surge",
+  grid_failure: "grid_failure",
 } as const;
 
 export interface SimulateIncidentBody {
   type: SimulateIncidentBodyType;
 }
 
-export type UpdateCustomTelemetryBodyActiveIncident = typeof UpdateCustomTelemetryBodyActiveIncident[keyof typeof UpdateCustomTelemetryBodyActiveIncident];
-
+export type UpdateCustomTelemetryBodyActiveIncident =
+  (typeof UpdateCustomTelemetryBodyActiveIncident)[keyof typeof UpdateCustomTelemetryBodyActiveIncident];
 
 export const UpdateCustomTelemetryBodyActiveIncident = {
-  none: 'none',
-  storm: 'storm',
-  transit_disruption: 'transit_disruption',
-  crowd_surge: 'crowd_surge',
-  grid_failure: 'grid_failure',
-  manual: 'manual',
+  none: "none",
+  storm: "storm",
+  transit_disruption: "transit_disruption",
+  crowd_surge: "crowd_surge",
+  grid_failure: "grid_failure",
+  manual: "manual",
 } as const;
 
 export type UpdateCustomTelemetryBodyGatesItem = {
@@ -183,13 +183,13 @@ export type UpdateCustomTelemetryBodyGatesItem = {
   crowdPct: number;
 };
 
-export type UpdateCustomTelemetryBodyTransportItemStatus = typeof UpdateCustomTelemetryBodyTransportItemStatus[keyof typeof UpdateCustomTelemetryBodyTransportItemStatus];
-
+export type UpdateCustomTelemetryBodyTransportItemStatus =
+  (typeof UpdateCustomTelemetryBodyTransportItemStatus)[keyof typeof UpdateCustomTelemetryBodyTransportItemStatus];
 
 export const UpdateCustomTelemetryBodyTransportItemStatus = {
-  normal: 'normal',
-  delayed: 'delayed',
-  disrupted: 'disrupted',
+  normal: "normal",
+  delayed: "delayed",
+  disrupted: "disrupted",
 } as const;
 
 export type UpdateCustomTelemetryBodyTransportItem = {
@@ -217,4 +217,3 @@ export type ResetIncident200 = {
 export type UpdateCustomTelemetry200 = {
   status: string;
 };
-

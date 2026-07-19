@@ -48,7 +48,10 @@ function isRequest(input: RequestInfo | URL): input is Request {
   return typeof Request !== "undefined" && input instanceof Request;
 }
 
-function resolveMethod(input: RequestInfo | URL, explicitMethod?: string): string {
+function resolveMethod(
+  input: RequestInfo | URL,
+  explicitMethod?: string,
+): string {
   if (explicitMethod) return explicitMethod.toUpperCase();
   if (isRequest(input)) return input.method.toUpperCase();
   return "GET";
@@ -97,17 +100,19 @@ function getMediaType(headers: Headers): string | null {
 }
 
 function isJsonMediaType(mediaType: string | null): boolean {
-  return mediaType === "application/json" || Boolean(mediaType?.endsWith("+json"));
+  return (
+    mediaType === "application/json" || Boolean(mediaType?.endsWith("+json"))
+  );
 }
 
 function isTextMediaType(mediaType: string | null): boolean {
   return Boolean(
     mediaType &&
-      (mediaType.startsWith("text/") ||
-        mediaType === "application/xml" ||
-        mediaType === "text/xml" ||
-        mediaType.endsWith("+xml") ||
-        mediaType === "application/x-www-form-urlencoded"),
+    (mediaType.startsWith("text/") ||
+      mediaType === "application/xml" ||
+      mediaType === "text/xml" ||
+      mediaType.endsWith("+xml") ||
+      mediaType === "application/x-www-form-urlencoded"),
   );
 }
 
@@ -251,7 +256,10 @@ async function parseJsonBody(
   }
 }
 
-async function parseErrorBody(response: Response, method: string): Promise<unknown> {
+async function parseErrorBody(
+  response: Response,
+  method: string,
+): Promise<unknown> {
   if (hasNoBody(response, method)) {
     return null;
   }
@@ -260,7 +268,9 @@ async function parseErrorBody(response: Response, method: string): Promise<unkno
 
   // Fall back to text when blob() is unavailable (e.g. some React Native builds).
   if (mediaType && !isJsonMediaType(mediaType) && !isTextMediaType(mediaType)) {
-    return typeof response.blob === "function" ? response.blob() : response.text();
+    return typeof response.blob === "function"
+      ? response.blob()
+      : response.text();
   }
 
   const raw = await response.text();
@@ -315,7 +325,7 @@ async function parseSuccessBody(
       if (typeof response.blob !== "function") {
         throw new TypeError(
           "Blob responses are not supported in this runtime. " +
-            "Use responseType \"json\" or \"text\" instead.",
+            'Use responseType "json" or "text" instead.',
         );
       }
       return response.blob();
@@ -335,7 +345,10 @@ export async function customFetch<T = unknown>(
     throw new TypeError(`customFetch: ${method} requests cannot have a body.`);
   }
 
-  const headers = mergeHeaders(isRequest(input) ? input.headers : undefined, headersInit);
+  const headers = mergeHeaders(
+    isRequest(input) ? input.headers : undefined,
+    headersInit,
+  );
 
   if (
     typeof init.body === "string" &&
@@ -361,8 +374,9 @@ export async function customFetch<T = unknown>(
   const urlStr = resolveUrl(input);
   const requestInfo = { method, url: urlStr };
 
-  const isFallbackEnvironment = typeof window !== "undefined" && 
-    window.location.hostname !== "localhost" && 
+  const isFallbackEnvironment =
+    typeof window !== "undefined" &&
+    window.location.hostname !== "localhost" &&
     window.location.hostname !== "127.0.0.1";
 
   if (urlStr.includes("/api/genai/") && isFallbackEnvironment) {
@@ -376,7 +390,12 @@ export async function customFetch<T = unknown>(
     const response = await fetch(input, { ...init, method, headers });
 
     if (!response.ok) {
-      if ((response.status === 404 || response.status === 502 || response.status === 500) && urlStr.includes("/api/genai/")) {
+      if (
+        (response.status === 404 ||
+          response.status === 502 ||
+          response.status === 500) &&
+        urlStr.includes("/api/genai/")
+      ) {
         const fallbackRes = handleFallbackRequest(urlStr, init);
         if (fallbackRes !== null) {
           return fallbackRes as unknown as T;
@@ -432,22 +451,69 @@ let weatherCondition = "Clear";
 let energyLoadPct = 64;
 
 const gates: GateState[] = [
-  { id: "gate-1", name: "Gate 1 — North Concourse", crowdPct: 38, status: "moderate" },
-  { id: "gate-4", name: "Gate 4 — West Plaza", crowdPct: 72, status: "congested" },
-  { id: "gate-6", name: "Gate 6 — Family Entrance", crowdPct: 21, status: "clear" },
-  { id: "gate-9", name: "Gate 9 — VIP South", crowdPct: 46, status: "moderate" },
-  { id: "gate-12", name: "Gate 12 — Accessible Entrance", crowdPct: 18, status: "clear" },
-  { id: "gate-14", name: "Gate 14 — East Concourse", crowdPct: 61, status: "moderate" },
+  {
+    id: "gate-1",
+    name: "Gate 1 — North Concourse",
+    crowdPct: 38,
+    status: "moderate",
+  },
+  {
+    id: "gate-4",
+    name: "Gate 4 — West Plaza",
+    crowdPct: 72,
+    status: "congested",
+  },
+  {
+    id: "gate-6",
+    name: "Gate 6 — Family Entrance",
+    crowdPct: 21,
+    status: "clear",
+  },
+  {
+    id: "gate-9",
+    name: "Gate 9 — VIP South",
+    crowdPct: 46,
+    status: "moderate",
+  },
+  {
+    id: "gate-12",
+    name: "Gate 12 — Accessible Entrance",
+    crowdPct: 18,
+    status: "clear",
+  },
+  {
+    id: "gate-14",
+    name: "Gate 14 — East Concourse",
+    crowdPct: 61,
+    status: "moderate",
+  },
 ];
 
 const transport: TransportLineState[] = [
   { name: "Metro Gold Line", mode: "rail", status: "normal", etaMinutes: 4 },
-  { name: "Fan Shuttle Loop A", mode: "shuttle", status: "normal", etaMinutes: 7 },
-  { name: "Rideshare Pickup Zone", mode: "rideshare", status: "delayed", etaMinutes: 12 },
-  { name: "North Parking Structure", mode: "parking", status: "normal", etaMinutes: 0 },
+  {
+    name: "Fan Shuttle Loop A",
+    mode: "shuttle",
+    status: "normal",
+    etaMinutes: 7,
+  },
+  {
+    name: "Rideshare Pickup Zone",
+    mode: "rideshare",
+    status: "delayed",
+    etaMinutes: 12,
+  },
+  {
+    name: "North Parking Structure",
+    mode: "parking",
+    status: "normal",
+    etaMinutes: 0,
+  },
 ];
 
-function statusForCrowdPct(pct: number): "clear" | "moderate" | "congested" | "critical" {
+function statusForCrowdPct(
+  pct: number,
+): "clear" | "moderate" | "congested" | "critical" {
   if (pct >= 90) return "critical";
   if (pct >= 70) return "congested";
   if (pct >= 40) return "moderate";
@@ -458,23 +524,37 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-function randomWalk(value: number, magnitude: number, min: number, max: number): number {
+function randomWalk(
+  value: number,
+  magnitude: number,
+  min: number,
+  max: number,
+): number {
   const delta = (Math.random() - 0.5) * 2 * magnitude;
   return clamp(value + delta, min, max);
 }
 
-const WEATHER_CONDITIONS = ["Clear", "Overcast", "Light Rain", "Humid", "Windy"];
+const WEATHER_CONDITIONS = [
+  "Clear",
+  "Overcast",
+  "Light Rain",
+  "Humid",
+  "Windy",
+];
 
 function tickFallback(): void {
   if (isManualOverride) return;
-  
+
   if (activeIncident === "none") {
     for (const gate of gates) {
       gate.crowdPct = Math.round(randomWalk(gate.crowdPct, 6, 5, 99));
       gate.status = statusForCrowdPct(gate.crowdPct);
     }
     for (const line of transport) {
-      line.etaMinutes = Math.max(0, Math.round(randomWalk(line.etaMinutes, 2, 0, 20)));
+      line.etaMinutes = Math.max(
+        0,
+        Math.round(randomWalk(line.etaMinutes, 2, 0, 20)),
+      );
       if (line.etaMinutes > 14) {
         line.status = "disrupted";
       } else if (line.etaMinutes > 9) {
@@ -485,7 +565,10 @@ function tickFallback(): void {
     }
     energyLoadPct = Math.round(randomWalk(energyLoadPct, 3, 30, 95));
     if (Math.random() < 0.08) {
-      weatherCondition = WEATHER_CONDITIONS[Math.floor(Math.random() * WEATHER_CONDITIONS.length)] ?? weatherCondition;
+      weatherCondition =
+        WEATHER_CONDITIONS[
+          Math.floor(Math.random() * WEATHER_CONDITIONS.length)
+        ] ?? weatherCondition;
     }
   } else {
     if (activeIncident === "storm") {
@@ -498,9 +581,15 @@ function tickFallback(): void {
       for (const line of transport) {
         if (line.mode === "shuttle" || line.mode === "rideshare") {
           line.status = "delayed";
-          line.etaMinutes = Math.max(14, Math.round(randomWalk(line.etaMinutes, 1, 14, 24)));
+          line.etaMinutes = Math.max(
+            14,
+            Math.round(randomWalk(line.etaMinutes, 1, 14, 24)),
+          );
         } else {
-          line.etaMinutes = Math.max(0, Math.round(randomWalk(line.etaMinutes, 1, 2, 8)));
+          line.etaMinutes = Math.max(
+            0,
+            Math.round(randomWalk(line.etaMinutes, 1, 2, 8)),
+          );
           line.status = "normal";
         }
       }
@@ -508,22 +597,34 @@ function tickFallback(): void {
       for (const line of transport) {
         if (line.mode === "rail") {
           line.status = "disrupted";
-          line.etaMinutes = Math.max(22, Math.round(randomWalk(line.etaMinutes, 1, 22, 30)));
+          line.etaMinutes = Math.max(
+            22,
+            Math.round(randomWalk(line.etaMinutes, 1, 22, 30)),
+          );
         }
       }
     } else if (activeIncident === "crowd_surge") {
-      const gate4 = gates.find(g => g.id === "gate-4");
+      const gate4 = gates.find((g) => g.id === "gate-4");
       if (gate4) {
-        gate4.crowdPct = Math.max(92, Math.round(randomWalk(gate4.crowdPct, 1, 92, 99)));
+        gate4.crowdPct = Math.max(
+          92,
+          Math.round(randomWalk(gate4.crowdPct, 1, 92, 99)),
+        );
         gate4.status = "critical";
       }
-      const gate14 = gates.find(g => g.id === "gate-14");
+      const gate14 = gates.find((g) => g.id === "gate-14");
       if (gate14) {
-        gate14.crowdPct = Math.max(88, Math.round(randomWalk(gate14.crowdPct, 1, 88, 96)));
+        gate14.crowdPct = Math.max(
+          88,
+          Math.round(randomWalk(gate14.crowdPct, 1, 88, 96)),
+        );
         gate14.status = "critical";
       }
     } else if (activeIncident === "grid_failure") {
-      energyLoadPct = Math.max(94, Math.round(randomWalk(energyLoadPct, 1, 94, 99)));
+      energyLoadPct = Math.max(
+        94,
+        Math.round(randomWalk(energyLoadPct, 1, 94, 99)),
+      );
     }
   }
 }
@@ -531,7 +632,7 @@ function tickFallback(): void {
 function getFallbackState(): OperationalStateSnapshot {
   tickFallback();
   const crowdCount = Math.round(
-    gates.reduce((sum, gate) => sum + gate.crowdPct, 0) * 420
+    gates.reduce((sum, gate) => sum + gate.crowdPct, 0) * 420,
   );
   return {
     timestamp: new Date().toISOString(),
@@ -539,8 +640,8 @@ function getFallbackState(): OperationalStateSnapshot {
     energyLoadPct,
     crowdCount,
     activeIncident,
-    gates: gates.map(g => ({ ...g })),
-    transport: transport.map(t => ({ ...t })),
+    gates: gates.map((g) => ({ ...g })),
+    transport: transport.map((t) => ({ ...t })),
   };
 }
 
@@ -568,12 +669,12 @@ function setActiveIncidentFallback(type: string): void {
       }
     }
   } else if (type === "crowd_surge") {
-    const gate4 = gates.find(g => g.id === "gate-4");
+    const gate4 = gates.find((g) => g.id === "gate-4");
     if (gate4) {
       gate4.crowdPct = 98;
       gate4.status = "critical";
     }
-    const gate14 = gates.find(g => g.id === "gate-14");
+    const gate14 = gates.find((g) => g.id === "gate-14");
     if (gate14) {
       gate14.crowdPct = 92;
       gate14.status = "critical";
@@ -601,11 +702,12 @@ function resetActiveIncidentFallback(): void {
 function updateOperationalStateFallback(data: any): void {
   isManualOverride = true;
   activeIncident = data.activeIncident ?? "none";
-  if (data.weatherCondition !== undefined) weatherCondition = data.weatherCondition;
+  if (data.weatherCondition !== undefined)
+    weatherCondition = data.weatherCondition;
   if (data.energyLoadPct !== undefined) energyLoadPct = data.energyLoadPct;
   if (data.gates !== undefined) {
     for (const gateInput of data.gates) {
-      const gate = gates.find(g => g.id === gateInput.id);
+      const gate = gates.find((g) => g.id === gateInput.id);
       if (gate) {
         gate.crowdPct = gateInput.crowdPct;
         gate.status = statusForCrowdPct(gate.crowdPct);
@@ -614,7 +716,7 @@ function updateOperationalStateFallback(data: any): void {
   }
   if (data.transport !== undefined) {
     for (const transInput of data.transport) {
-      const line = transport.find(t => t.name === transInput.name);
+      const line = transport.find((t) => t.name === transInput.name);
       if (line) {
         line.etaMinutes = transInput.etaMinutes;
         line.status = transInput.status;
@@ -647,95 +749,105 @@ function buildOperationsBriefFallback(state: OperationalStateSnapshot) {
       directives.push({
         id: nextBriefId("security"),
         title: "Severe weather warning: Seek shelter",
-        detail: "Lightning detected within 5 miles. Directing fans to main concourse shelters. High-elevation walkways closed for safety.",
+        detail:
+          "Lightning detected within 5 miles. Directing fans to main concourse shelters. High-elevation walkways closed for safety.",
         category: "security",
         severity: "critical",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextBriefId("transport"),
         title: "Reroute shuttle loop transit",
-        detail: "Severe rain starting. Diverting active parking shuttles to covered lower terminal to safeguard volunteers and fans.",
+        detail:
+          "Severe rain starting. Diverting active parking shuttles to covered lower terminal to safeguard volunteers and fans.",
         category: "transport",
         severity: "watch",
         gate: "gate-4",
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextBriefId("sustainability"),
         title: "Power grid load-shedding active",
-        detail: "Grid load at 88%. Concourse lighting dimmed by 30% and outdoor digital displays shifted to low-power emergency mode.",
+        detail:
+          "Grid load at 88%. Concourse lighting dimmed by 30% and outdoor digital displays shifted to low-power emergency mode.",
         category: "sustainability",
         severity: "watch",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
     } else if (state.activeIncident === "transit_disruption") {
       directives.push({
         id: nextBriefId("transport"),
         title: "Metro Gold Line outage: Service suspended",
-        detail: "Signal failure on Gold Line. Activating backup shuttle loops between West Plaza and Downtown station. Delay ETA 25 min.",
+        detail:
+          "Signal failure on Gold Line. Activating backup shuttle loops between West Plaza and Downtown station. Delay ETA 25 min.",
         category: "transport",
         severity: "critical",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextBriefId("crowd"),
         title: "Divert outbound flows to Rideshare Zone",
-        detail: "Metro disruption will cause heavy post-match delays. Dynamic signs rerouting departing fans toward Rideshare Zone B.",
+        detail:
+          "Metro disruption will cause heavy post-match delays. Dynamic signs rerouting departing fans toward Rideshare Zone B.",
         category: "crowd",
         severity: "watch",
         gate: "gate-4",
-        status: "executing"
+        status: "executing",
       });
     } else if (state.activeIncident === "crowd_surge") {
       directives.push({
         id: nextBriefId("crowd"),
         title: "Gate 4 & Gate 14 surge: Open overflows",
-        detail: "Concourse ingress pressure exceeded 90%. Opening emergency gates 4B and 14B to double entry lane throughput.",
+        detail:
+          "Concourse ingress pressure exceeded 90%. Opening emergency gates 4B and 14B to double entry lane throughput.",
         category: "crowd",
         severity: "critical",
         gate: "gate-4",
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextBriefId("security"),
         title: "Deploy crowd volunteers to West Plaza",
-        detail: "Deploying 15 additional safety stewards to Gate 4 concourse corridor to assist with line forming and ticket scans.",
+        detail:
+          "Deploying 15 additional safety stewards to Gate 4 concourse corridor to assist with line forming and ticket scans.",
         category: "security",
         severity: "watch",
         gate: "gate-4",
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextBriefId("ticketing"),
         title: "Redirect mobile ticket support",
-        detail: "Congestion at Gate 14. Setting up mobile ticket desk 6 to intercept fans with QR scan issues before they block lanes.",
+        detail:
+          "Congestion at Gate 14. Setting up mobile ticket desk 6 to intercept fans with QR scan issues before they block lanes.",
         category: "ticketing",
         severity: "info",
         gate: "gate-14",
-        status: "executing"
+        status: "executing",
       });
     } else if (state.activeIncident === "grid_failure") {
       directives.push({
         id: nextBriefId("sustainability"),
         title: "Grid substation failure: Backup active",
-        detail: "Primary power lost. Auxiliary diesel generator banks 1 and 2 started. Critical pitch illumination and safety systems online.",
+        detail:
+          "Primary power lost. Auxiliary diesel generator banks 1 and 2 started. Critical pitch illumination and safety systems online.",
         category: "sustainability",
         severity: "critical",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextBriefId("sustainability"),
         title: "Concourse HVAC reduced to 50%",
-        detail: "Load-shedding active. HVAC offline in low-occupancy service areas. Advise venue staff to keep gates open for cross-ventilation.",
+        detail:
+          "Load-shedding active. HVAC offline in low-occupancy service areas. Advise venue staff to keep gates open for cross-ventilation.",
         category: "sustainability",
         severity: "watch",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
     }
   }
@@ -743,7 +855,7 @@ function buildOperationsBriefFallback(state: OperationalStateSnapshot) {
   if (directives.length < 5) {
     for (const gate of congested) {
       if (directives.length >= 5) break;
-      if (directives.some(d => d.gate === gate.id)) continue;
+      if (directives.some((d) => d.gate === gate.id)) continue;
       directives.push({
         id: nextBriefId("crowd"),
         title: `Reroute foot traffic — ${gate.name}`,
@@ -773,11 +885,13 @@ function buildOperationsBriefFallback(state: OperationalStateSnapshot) {
     });
   }
 
-  const disruptedTransport = state.transport.filter((t) => t.status !== "normal");
+  const disruptedTransport = state.transport.filter(
+    (t) => t.status !== "normal",
+  );
   if (directives.length < 5) {
     for (const line of disruptedTransport) {
       if (directives.length >= 5) break;
-      if (directives.some(d => d.title.includes(line.name))) continue;
+      if (directives.some((d) => d.title.includes(line.name))) continue;
       directives.push({
         id: nextBriefId("transport"),
         title: `${line.status === "disrupted" ? "Disruption" : "Delay"} on ${line.name}`,
@@ -802,8 +916,14 @@ function buildOperationsBriefFallback(state: OperationalStateSnapshot) {
     });
   }
 
-  const severityRank: Record<string, number> = { critical: 0, watch: 1, info: 2 };
-  directives.sort((a, b) => severityRank[a.severity] - severityRank[b.severity]);
+  const severityRank: Record<string, number> = {
+    critical: 0,
+    watch: 1,
+    info: 2,
+  };
+  directives.sort(
+    (a, b) => severityRank[a.severity] - severityRank[b.severity],
+  );
 
   let summary = "";
   if (state.activeIncident && state.activeIncident !== "none") {
@@ -833,10 +953,51 @@ const LANGUAGE_NAMES: Record<string, string> = {
 };
 
 const LANGUAGE_MARKERS: Record<string, string[]> = {
-  en: ["where", "is", "the", "gate", "section", "please", "thanks", "how", "ticket"],
-  es: ["dónde", "donde", "está", "esta", "puerta", "sección", "gracias", "por favor", "más rápida", "boleto", "entrada"],
-  fr: ["où", "est", "porte", "section", "merci", "s'il vous plaît", "billet", "rapide"],
-  pt: ["onde", "está", "esta", "portão", "seção", "obrigado", "ingresso", "bilhete", "rápida"],
+  en: [
+    "where",
+    "is",
+    "the",
+    "gate",
+    "section",
+    "please",
+    "thanks",
+    "how",
+    "ticket",
+  ],
+  es: [
+    "dónde",
+    "donde",
+    "está",
+    "esta",
+    "puerta",
+    "sección",
+    "gracias",
+    "por favor",
+    "más rápida",
+    "boleto",
+    "entrada",
+  ],
+  fr: [
+    "où",
+    "est",
+    "porte",
+    "section",
+    "merci",
+    "s'il vous plaît",
+    "billet",
+    "rapide",
+  ],
+  pt: [
+    "onde",
+    "está",
+    "esta",
+    "portão",
+    "seção",
+    "obrigado",
+    "ingresso",
+    "bilhete",
+    "rápida",
+  ],
 };
 
 function detectLanguage(message: string) {
@@ -870,43 +1031,117 @@ function detectLanguage(message: string) {
 
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
   navigation: [
-    "gate", "entrance", "section", "seat", "where is", "way to",
-    "puerta", "entrada", "sección", "asiento", "dónde", "donde",
-    "porte", "où", "billete de entrada", "assento",
-    "portão", "seção", "onde",
-    "ゲート", "入口", "席", "どこ",
-    "بوابة", "مدخل", "مقعد", "أين",
+    "gate",
+    "entrance",
+    "section",
+    "seat",
+    "where is",
+    "way to",
+    "puerta",
+    "entrada",
+    "sección",
+    "asiento",
+    "dónde",
+    "donde",
+    "porte",
+    "où",
+    "billete de entrada",
+    "assento",
+    "portão",
+    "seção",
+    "onde",
+    "ゲート",
+    "入口",
+    "席",
+    "どこ",
+    "بوابة",
+    "مدخل",
+    "مقعد",
+    "أين",
   ],
   accessibility: [
-    "wheelchair", "accessible", "disability", "ramp",
-    "silla de ruedas", "accesible", "discapacidad", "rampa",
-    "fauteuil roulant", "handicap", "rampe",
-    "cadeira de rodas", "acessível", "deficiência",
-    "車椅子", "バリアフリー", "障害",
-    "كرسي متحرك", "إعاقة",
+    "wheelchair",
+    "accessible",
+    "disability",
+    "ramp",
+    "silla de ruedas",
+    "accesible",
+    "discapacidad",
+    "rampa",
+    "fauteuil roulant",
+    "handicap",
+    "rampe",
+    "cadeira de rodas",
+    "acessível",
+    "deficiência",
+    "車椅子",
+    "バリアフリー",
+    "障害",
+    "كرسي متحرك",
+    "إعاقة",
   ],
   transportation: [
-    "shuttle", "metro", "train", "parking", "bus", "ride",
-    "autobús", "autobus", "metro", "tren", "estacionamiento", "transporte",
-    "navette", "métro", "parking",
-    "ônibus", "onibus", "metrô", "trem", "estacionamento",
-    "シャトル", "電車", "駐車場", "バス",
-    "حافلة", "مترو", "وقوف السيارات",
+    "shuttle",
+    "metro",
+    "train",
+    "parking",
+    "bus",
+    "ride",
+    "autobús",
+    "autobus",
+    "metro",
+    "tren",
+    "estacionamiento",
+    "transporte",
+    "navette",
+    "métro",
+    "parking",
+    "ônibus",
+    "onibus",
+    "metrô",
+    "trem",
+    "estacionamento",
+    "シャトル",
+    "電車",
+    "駐車場",
+    "バス",
+    "حافلة",
+    "مترو",
+    "وقوف السيارات",
   ],
   ticketing: [
-    "ticket", "qr", "lost", "refund",
-    "boleto", "perdido", "reembolso",
-    "billet", "perdu", "remboursement",
-    "bilhete", "ingresso", "perdido", "reembolso",
-    "チケット", "紛失", "払い戻し",
-    "تذكرة", "فقدت", "استرداد",
+    "ticket",
+    "qr",
+    "lost",
+    "refund",
+    "boleto",
+    "perdido",
+    "reembolso",
+    "billet",
+    "perdu",
+    "remboursement",
+    "bilhete",
+    "ingresso",
+    "perdido",
+    "reembolso",
+    "チケット",
+    "紛失",
+    "払い戻し",
+    "تذكرة",
+    "فقدت",
+    "استرداد",
   ],
   general: [],
 };
 
 function detectCategory(message: string) {
   const normalized = message.toLowerCase();
-  for (const category of ["accessibility", "transportation", "ticketing", "navigation"] as const) {
+  for (const category of [
+    "accessibility",
+    "transportation",
+    "ticketing",
+    "navigation",
+  ] as const) {
     if (CATEGORY_KEYWORDS[category].some((kw) => normalized.includes(kw))) {
       return category;
     }
@@ -916,7 +1151,8 @@ function detectCategory(message: string) {
 
 const TRANSLATED_MESSAGE_SUMMARY: Record<string, string> = {
   navigation: "Fan is asking for directions to a gate, section, or seat.",
-  accessibility: "Fan is asking about wheelchair access or accessibility accommodations.",
+  accessibility:
+    "Fan is asking about wheelchair access or accessibility accommodations.",
   transportation: "Fan is asking about shuttle, metro, or parking options.",
   ticketing: "Fan is asking about a ticket, QR code, or refund issue.",
   general: "Fan sent a general greeting or open-ended question.",
@@ -935,7 +1171,10 @@ function accessibleGateFallback(state: OperationalStateSnapshot) {
   return state.gates.find((g) => g.id === "gate-12") ?? state.gates[0];
 }
 
-function buildEnglishReplyFallback(category: string, state: OperationalStateSnapshot): string {
+function buildEnglishReplyFallback(
+  category: string,
+  state: OperationalStateSnapshot,
+): string {
   switch (category) {
     case "navigation": {
       const gate = quietestGateFallback(state);
@@ -959,7 +1198,10 @@ function buildEnglishReplyFallback(category: string, state: OperationalStateSnap
   }
 }
 
-const REPLY_BUILDERS_FALLBACK: Record<string, (category: string, state: OperationalStateSnapshot) => string> = {
+const REPLY_BUILDERS_FALLBACK: Record<
+  string,
+  (category: string, state: OperationalStateSnapshot) => string
+> = {
   es: (category, state) => {
     switch (category) {
       case "navigation": {
@@ -1084,7 +1326,7 @@ function handleConciergeMessageFallback(message: string) {
   const replyTranslation = buildEnglishReplyFallback(category, state);
   const builder = REPLY_BUILDERS_FALLBACK[code];
   const reply = builder ? builder(category, state) : replyTranslation;
-  
+
   return {
     detectedLanguage: name,
     translatedMessage: TRANSLATED_MESSAGE_SUMMARY[category],
@@ -1100,10 +1342,10 @@ function scanWebcamFallback(image: string) {
   return {
     success: true,
     type: isLikelyTicket ? "ticket" : "face",
-    message: isLikelyTicket 
+    message: isLikelyTicket
       ? "Gemini Vision verified pass: Valid FIFA 2026 QR Matchday Pass detected. Access granted."
       : "Gemini Vision verified face: Biometric scan authenticated successfully. Access granted.",
-    details: "Client-side fallback active."
+    details: "Client-side fallback active.",
   };
 }
 
@@ -1116,7 +1358,8 @@ function handleFallbackRequest(url: string, init: any): any {
     return buildOperationsBriefFallback(state);
   }
   if (url.includes("/api/genai/operations/simulate")) {
-    const body = typeof init.body === "string" ? JSON.parse(init.body) : init.body;
+    const body =
+      typeof init.body === "string" ? JSON.parse(init.body) : init.body;
     setActiveIncidentFallback(body?.type ?? "none");
     return { status: "success" };
   }
@@ -1125,16 +1368,19 @@ function handleFallbackRequest(url: string, init: any): any {
     return { status: "success" };
   }
   if (url.includes("/api/genai/operations/custom")) {
-    const body = typeof init.body === "string" ? JSON.parse(init.body) : init.body;
+    const body =
+      typeof init.body === "string" ? JSON.parse(init.body) : init.body;
     updateOperationalStateFallback(body ?? {});
     return { status: "success" };
   }
   if (url.includes("/api/genai/concierge/messages")) {
-    const body = typeof init.body === "string" ? JSON.parse(init.body) : init.body;
+    const body =
+      typeof init.body === "string" ? JSON.parse(init.body) : init.body;
     return handleConciergeMessageFallback(body?.message ?? "");
   }
   if (url.includes("/api/genai/scan-webcam")) {
-    const body = typeof init.body === "string" ? JSON.parse(init.body) : init.body;
+    const body =
+      typeof init.body === "string" ? JSON.parse(init.body) : init.body;
     return scanWebcamFallback(body?.image ?? "");
   }
   return null;

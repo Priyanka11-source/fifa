@@ -6,11 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type DirectiveSeverity = typeof DirectiveSeverity[keyof typeof DirectiveSeverity];
-
+export type DirectiveSeverity =
+  (typeof DirectiveSeverity)[keyof typeof DirectiveSeverity];
 
 export const DirectiveSeverity = {
-  info: 'info',
-  watch: 'watch',
-  critical: 'critical',
+  info: "info",
+  watch: "watch",
+  critical: "critical",
 } as const;

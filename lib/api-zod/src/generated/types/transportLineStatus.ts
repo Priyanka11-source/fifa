@@ -6,11 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TransportLineStatus = typeof TransportLineStatus[keyof typeof TransportLineStatus];
-
+export type TransportLineStatus =
+  (typeof TransportLineStatus)[keyof typeof TransportLineStatus];
 
 export const TransportLineStatus = {
-  normal: 'normal',
-  delayed: 'delayed',
-  disrupted: 'disrupted',
+  normal: "normal",
+  delayed: "delayed",
+  disrupted: "disrupted",
 } as const;

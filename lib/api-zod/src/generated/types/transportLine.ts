@@ -5,8 +5,8 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { TransportLineMode } from './transportLineMode';
-import type { TransportLineStatus } from './transportLineStatus';
+import type { TransportLineMode } from "./transportLineMode";
+import type { TransportLineStatus } from "./transportLineStatus";
 
 export interface TransportLine {
   name: string;

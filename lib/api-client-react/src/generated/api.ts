@@ -5,10 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   MutationFunction,
   QueryFunction,
@@ -16,8 +13,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   ConciergeMessageInput,
@@ -30,27 +27,27 @@ import type {
   SimulateIncident200,
   SimulateIncidentBody,
   UpdateCustomTelemetry200,
-  UpdateCustomTelemetryBody
-} from './api.schemas';
+  UpdateCustomTelemetryBody,
+} from "./api.schemas";
 
-import { customFetch } from '../custom-fetch';
-import type { ErrorType , BodyType } from '../custom-fetch';
+import { customFetch } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
+type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-
-const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+const withQueryKey = <T extends object, K>(
+  query: T,
+  queryKey: K,
+): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
+    if (key === "queryKey") continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
@@ -61,518 +58,579 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 export const getHealthCheckUrl = () => {
-
-
-
-
-  return `/api/healthz`
-}
+  return `/api/healthz`;
+};
 
 /**
  * Returns server health status
  * @summary Health check
  */
-export const healthCheck = async ( options?: RequestInit): Promise<HealthStatus> => {
-
-  return customFetch<HealthStatus>(getHealthCheckUrl(),
-  {
+export const healthCheck = async (
+  options?: RequestInit,
+): Promise<HealthStatus> => {
+  return customFetch<HealthStatus>(getHealthCheckUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
+    method: "GET",
+  });
+};
 
 export const getHealthCheckQueryKey = () => {
-    return [
-    `/api/healthz`
-    ] as const;
-    }
+  return [`/api/healthz`] as const;
+};
 
+export const getHealthCheckQueryOptions = <
+  TData = Awaited<ReturnType<typeof healthCheck>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof healthCheck>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getHealthCheckQueryOptions = <TData = Awaited<ReturnType<typeof healthCheck>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof healthCheck>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-) => {
+  const queryKey = queryOptions?.queryKey ?? getHealthCheckQueryKey();
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheck>>> = ({
+    signal,
+  }) => healthCheck({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getHealthCheckQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof healthCheck>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheck>>> = ({ signal }) => healthCheck({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof healthCheck>>, TError, TData> & { queryKey: QueryKey }
-}
-
-export type HealthCheckQueryResult = NonNullable<Awaited<ReturnType<typeof healthCheck>>>
-export type HealthCheckQueryError = ErrorType<unknown>
-
+export type HealthCheckQueryResult = NonNullable<
+  Awaited<ReturnType<typeof healthCheck>>
+>;
+export type HealthCheckQueryError = ErrorType<unknown>;
 
 /**
  * @summary Health check
  */
 
-export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof healthCheck>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export function useHealthCheck<
+  TData = Awaited<ReturnType<typeof healthCheck>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof healthCheck>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getHealthCheckQueryOptions(options);
 
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-
-  const queryOptions = getHealthCheckQueryOptions(options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-
-
-
-
-
-
 export const getGetOperationsStateUrl = () => {
-
-
-
-
-  return `/api/genai/operations/state`
-}
+  return `/api/genai/operations/state`;
+};
 
 /**
  * Returns current simulated gate crowd levels, transport status, weather, and energy load. Values drift slightly on every call to simulate live sensor telemetry.
  * @summary Get live simulated stadium operational state
  */
-export const getOperationsState = async ( options?: RequestInit): Promise<OperationalState> => {
-
-  return customFetch<OperationalState>(getGetOperationsStateUrl(),
-  {
+export const getOperationsState = async (
+  options?: RequestInit,
+): Promise<OperationalState> => {
+  return customFetch<OperationalState>(getGetOperationsStateUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
+    method: "GET",
+  });
+};
 
 export const getGetOperationsStateQueryKey = () => {
-    return [
-    `/api/genai/operations/state`
-    ] as const;
-    }
+  return [`/api/genai/operations/state`] as const;
+};
 
+export const getGetOperationsStateQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOperationsState>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getOperationsState>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetOperationsStateQueryOptions = <TData = Awaited<ReturnType<typeof getOperationsState>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOperationsState>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-) => {
+  const queryKey = queryOptions?.queryKey ?? getGetOperationsStateQueryKey();
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getOperationsState>>
+  > = ({ signal }) => getOperationsState({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetOperationsStateQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOperationsState>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOperationsState>>> = ({ signal }) => getOperationsState({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOperationsState>>, TError, TData> & { queryKey: QueryKey }
-}
-
-export type GetOperationsStateQueryResult = NonNullable<Awaited<ReturnType<typeof getOperationsState>>>
-export type GetOperationsStateQueryError = ErrorType<unknown>
-
+export type GetOperationsStateQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOperationsState>>
+>;
+export type GetOperationsStateQueryError = ErrorType<unknown>;
 
 /**
  * @summary Get live simulated stadium operational state
  */
 
-export function useGetOperationsState<TData = Awaited<ReturnType<typeof getOperationsState>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOperationsState>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export function useGetOperationsState<
+  TData = Awaited<ReturnType<typeof getOperationsState>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getOperationsState>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetOperationsStateQueryOptions(options);
 
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-
-  const queryOptions = getGetOperationsStateQueryOptions(options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-
-
-
-
-
-
 export const getGenerateOperationsBriefUrl = () => {
-
-
-
-
-  return `/api/genai/operations/brief`
-}
+  return `/api/genai/operations/brief`;
+};
 
 /**
  * Sends the current simulated operational state to a GenAI model and returns a structured set of prioritized operational directives (crowd, accessibility, transport, sustainability, security) plus a short human-readable summary.
  * @summary Generate a GenAI operational intelligence brief from the current live state
  */
-export const generateOperationsBrief = async ( options?: RequestInit): Promise<OperationsBrief> => {
-
-  return customFetch<OperationsBrief>(getGenerateOperationsBriefUrl(),
-  {
+export const generateOperationsBrief = async (
+  options?: RequestInit,
+): Promise<OperationsBrief> => {
+  return customFetch<OperationsBrief>(getGenerateOperationsBriefUrl(), {
     ...options,
-    method: 'POST'
+    method: "POST",
+  });
+};
 
+export const getGenerateOperationsBriefMutationOptions = <
+  TError = ErrorType<GenaiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateOperationsBrief>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateOperationsBrief>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["generateOperationsBrief"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateOperationsBrief>>,
+    void
+  > = () => {
+    return generateOperationsBrief(requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type GenerateOperationsBriefMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateOperationsBrief>>
+>;
 
+export type GenerateOperationsBriefMutationError = ErrorType<GenaiError>;
 
-
-export const getGenerateOperationsBriefMutationOptions = <TError = ErrorType<GenaiError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateOperationsBrief>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof generateOperationsBrief>>, TError,void, TContext> => {
-
-const mutationKey = ['generateOperationsBrief'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateOperationsBrief>>, void> = () => {
-
-
-          return  generateOperationsBrief(requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GenerateOperationsBriefMutationResult = NonNullable<Awaited<ReturnType<typeof generateOperationsBrief>>>
-
-    export type GenerateOperationsBriefMutationError = ErrorType<GenaiError>
-
-    /**
+/**
  * @summary Generate a GenAI operational intelligence brief from the current live state
  */
-export const useGenerateOperationsBrief = <TError = ErrorType<GenaiError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateOperationsBrief>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof generateOperationsBrief>>,
-        TError,
-        void,
-        TContext
-      > => {
-      return useMutation(getGenerateOperationsBriefMutationOptions(options));
-    }
+export const useGenerateOperationsBrief = <
+  TError = ErrorType<GenaiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateOperationsBrief>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateOperationsBrief>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getGenerateOperationsBriefMutationOptions(options));
+};
 
 export const getSimulateIncidentUrl = () => {
-
-
-
-
-  return `/api/genai/operations/simulate`
-}
+  return `/api/genai/operations/simulate`;
+};
 
 /**
  * Sets the active simulated incident, which overrides the live telemetry and shifts the stadium into emergency operational state.
  * @summary Simulate a stadium incident
  */
-export const simulateIncident = async (simulateIncidentBody: SimulateIncidentBody, options?: RequestInit): Promise<SimulateIncident200> => {
-
-  return customFetch<SimulateIncident200>(getSimulateIncidentUrl(),
-  {
+export const simulateIncident = async (
+  simulateIncidentBody: SimulateIncidentBody,
+  options?: RequestInit,
+): Promise<SimulateIncident200> => {
+  return customFetch<SimulateIncident200>(getSimulateIncidentUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(simulateIncidentBody)
-  }
-);}
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(simulateIncidentBody),
+  });
+};
 
+export const getSimulateIncidentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof simulateIncident>>,
+    TError,
+    { data: BodyType<SimulateIncidentBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof simulateIncident>>,
+  TError,
+  { data: BodyType<SimulateIncidentBody> },
+  TContext
+> => {
+  const mutationKey = ["simulateIncident"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof simulateIncident>>,
+    { data: BodyType<SimulateIncidentBody> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return simulateIncident(data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getSimulateIncidentMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simulateIncident>>, TError,{data: BodyType<SimulateIncidentBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof simulateIncident>>, TError,{data: BodyType<SimulateIncidentBody>}, TContext> => {
+export type SimulateIncidentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof simulateIncident>>
+>;
+export type SimulateIncidentMutationBody = BodyType<SimulateIncidentBody>;
+export type SimulateIncidentMutationError = ErrorType<unknown>;
 
-const mutationKey = ['simulateIncident'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof simulateIncident>>, {data: BodyType<SimulateIncidentBody>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  simulateIncident(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SimulateIncidentMutationResult = NonNullable<Awaited<ReturnType<typeof simulateIncident>>>
-    export type SimulateIncidentMutationBody = BodyType<SimulateIncidentBody>
-    export type SimulateIncidentMutationError = ErrorType<unknown>
-
-    /**
+/**
  * @summary Simulate a stadium incident
  */
-export const useSimulateIncident = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof simulateIncident>>, TError,{data: BodyType<SimulateIncidentBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof simulateIncident>>,
-        TError,
-        {data: BodyType<SimulateIncidentBody>},
-        TContext
-      > => {
-      return useMutation(getSimulateIncidentMutationOptions(options));
-    }
+export const useSimulateIncident = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof simulateIncident>>,
+    TError,
+    { data: BodyType<SimulateIncidentBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof simulateIncident>>,
+  TError,
+  { data: BodyType<SimulateIncidentBody> },
+  TContext
+> => {
+  return useMutation(getSimulateIncidentMutationOptions(options));
+};
 
 export const getResetIncidentUrl = () => {
-
-
-
-
-  return `/api/genai/operations/reset`
-}
+  return `/api/genai/operations/reset`;
+};
 
 /**
  * Clears any active incident and restores normal simulated operations.
  * @summary Reset stadium simulation
  */
-export const resetIncident = async ( options?: RequestInit): Promise<ResetIncident200> => {
-
-  return customFetch<ResetIncident200>(getResetIncidentUrl(),
-  {
+export const resetIncident = async (
+  options?: RequestInit,
+): Promise<ResetIncident200> => {
+  return customFetch<ResetIncident200>(getResetIncidentUrl(), {
     ...options,
-    method: 'POST'
+    method: "POST",
+  });
+};
 
+export const getResetIncidentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resetIncident>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resetIncident>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["resetIncident"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resetIncident>>,
+    void
+  > = () => {
+    return resetIncident(requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type ResetIncidentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resetIncident>>
+>;
 
+export type ResetIncidentMutationError = ErrorType<unknown>;
 
-
-export const getResetIncidentMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIncident>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof resetIncident>>, TError,void, TContext> => {
-
-const mutationKey = ['resetIncident'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetIncident>>, void> = () => {
-
-
-          return  resetIncident(requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ResetIncidentMutationResult = NonNullable<Awaited<ReturnType<typeof resetIncident>>>
-
-    export type ResetIncidentMutationError = ErrorType<unknown>
-
-    /**
+/**
  * @summary Reset stadium simulation
  */
-export const useResetIncident = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIncident>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof resetIncident>>,
-        TError,
-        void,
-        TContext
-      > => {
-      return useMutation(getResetIncidentMutationOptions(options));
-    }
+export const useResetIncident = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resetIncident>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof resetIncident>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getResetIncidentMutationOptions(options));
+};
 
 export const getSendConciergeMessageUrl = () => {
-
-
-
-
-  return `/api/genai/concierge/messages`
-}
+  return `/api/genai/concierge/messages`;
+};
 
 /**
  * Detects the input language, translates it to English, classifies the intent (navigation, accessibility, transportation, ticketing, general), and returns a helpful concierge reply in the fan's original language plus an English translation of that reply.
  * @summary Send a message to the multilingual GenAI fan concierge
  */
-export const sendConciergeMessage = async (conciergeMessageInput: ConciergeMessageInput, options?: RequestInit): Promise<ConciergeMessageOutput> => {
-
-  return customFetch<ConciergeMessageOutput>(getSendConciergeMessageUrl(),
-  {
+export const sendConciergeMessage = async (
+  conciergeMessageInput: ConciergeMessageInput,
+  options?: RequestInit,
+): Promise<ConciergeMessageOutput> => {
+  return customFetch<ConciergeMessageOutput>(getSendConciergeMessageUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(conciergeMessageInput)
-  }
-);}
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(conciergeMessageInput),
+  });
+};
 
+export const getSendConciergeMessageMutationOptions = <
+  TError = ErrorType<GenaiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendConciergeMessage>>,
+    TError,
+    { data: BodyType<ConciergeMessageInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sendConciergeMessage>>,
+  TError,
+  { data: BodyType<ConciergeMessageInput> },
+  TContext
+> => {
+  const mutationKey = ["sendConciergeMessage"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sendConciergeMessage>>,
+    { data: BodyType<ConciergeMessageInput> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return sendConciergeMessage(data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getSendConciergeMessageMutationOptions = <TError = ErrorType<GenaiError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendConciergeMessage>>, TError,{data: BodyType<ConciergeMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof sendConciergeMessage>>, TError,{data: BodyType<ConciergeMessageInput>}, TContext> => {
+export type SendConciergeMessageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendConciergeMessage>>
+>;
+export type SendConciergeMessageMutationBody = BodyType<ConciergeMessageInput>;
+export type SendConciergeMessageMutationError = ErrorType<GenaiError>;
 
-const mutationKey = ['sendConciergeMessage'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendConciergeMessage>>, {data: BodyType<ConciergeMessageInput>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  sendConciergeMessage(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SendConciergeMessageMutationResult = NonNullable<Awaited<ReturnType<typeof sendConciergeMessage>>>
-    export type SendConciergeMessageMutationBody = BodyType<ConciergeMessageInput>
-    export type SendConciergeMessageMutationError = ErrorType<GenaiError>
-
-    /**
+/**
  * @summary Send a message to the multilingual GenAI fan concierge
  */
-export const useSendConciergeMessage = <TError = ErrorType<GenaiError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendConciergeMessage>>, TError,{data: BodyType<ConciergeMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof sendConciergeMessage>>,
-        TError,
-        {data: BodyType<ConciergeMessageInput>},
-        TContext
-      > => {
-      return useMutation(getSendConciergeMessageMutationOptions(options));
-    }
+export const useSendConciergeMessage = <
+  TError = ErrorType<GenaiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendConciergeMessage>>,
+    TError,
+    { data: BodyType<ConciergeMessageInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof sendConciergeMessage>>,
+  TError,
+  { data: BodyType<ConciergeMessageInput> },
+  TContext
+> => {
+  return useMutation(getSendConciergeMessageMutationOptions(options));
+};
 
 export const getUpdateCustomTelemetryUrl = () => {
-
-
-
-
-  return `/api/genai/operations/custom`
-}
+  return `/api/genai/operations/custom`;
+};
 
 /**
  * Updates the simulated stadium state parameters manually. This shifts the active incident status to 'manual' and freezes automated drift updates.
  * @summary Update custom simulated stadium operational state (manual entry)
  */
-export const updateCustomTelemetry = async (updateCustomTelemetryBody: UpdateCustomTelemetryBody, options?: RequestInit): Promise<UpdateCustomTelemetry200> => {
-
-  return customFetch<UpdateCustomTelemetry200>(getUpdateCustomTelemetryUrl(),
-  {
+export const updateCustomTelemetry = async (
+  updateCustomTelemetryBody: UpdateCustomTelemetryBody,
+  options?: RequestInit,
+): Promise<UpdateCustomTelemetry200> => {
+  return customFetch<UpdateCustomTelemetry200>(getUpdateCustomTelemetryUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updateCustomTelemetryBody)
-  }
-);}
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateCustomTelemetryBody),
+  });
+};
 
+export const getUpdateCustomTelemetryMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateCustomTelemetry>>,
+    TError,
+    { data: BodyType<UpdateCustomTelemetryBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateCustomTelemetry>>,
+  TError,
+  { data: BodyType<UpdateCustomTelemetryBody> },
+  TContext
+> => {
+  const mutationKey = ["updateCustomTelemetry"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateCustomTelemetry>>,
+    { data: BodyType<UpdateCustomTelemetryBody> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return updateCustomTelemetry(data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getUpdateCustomTelemetryMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCustomTelemetry>>, TError,{data: BodyType<UpdateCustomTelemetryBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateCustomTelemetry>>, TError,{data: BodyType<UpdateCustomTelemetryBody>}, TContext> => {
+export type UpdateCustomTelemetryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateCustomTelemetry>>
+>;
+export type UpdateCustomTelemetryMutationBody =
+  BodyType<UpdateCustomTelemetryBody>;
+export type UpdateCustomTelemetryMutationError = ErrorType<unknown>;
 
-const mutationKey = ['updateCustomTelemetry'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCustomTelemetry>>, {data: BodyType<UpdateCustomTelemetryBody>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  updateCustomTelemetry(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateCustomTelemetryMutationResult = NonNullable<Awaited<ReturnType<typeof updateCustomTelemetry>>>
-    export type UpdateCustomTelemetryMutationBody = BodyType<UpdateCustomTelemetryBody>
-    export type UpdateCustomTelemetryMutationError = ErrorType<unknown>
-
-    /**
+/**
  * @summary Update custom simulated stadium operational state (manual entry)
  */
-export const useUpdateCustomTelemetry = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCustomTelemetry>>, TError,{data: BodyType<UpdateCustomTelemetryBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof updateCustomTelemetry>>,
-        TError,
-        {data: BodyType<UpdateCustomTelemetryBody>},
-        TContext
-      > => {
-      return useMutation(getUpdateCustomTelemetryMutationOptions(options));
-    }
-
+export const useUpdateCustomTelemetry = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateCustomTelemetry>>,
+    TError,
+    { data: BodyType<UpdateCustomTelemetryBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateCustomTelemetry>>,
+  TError,
+  { data: BodyType<UpdateCustomTelemetryBody> },
+  TContext
+> => {
+  return useMutation(getUpdateCustomTelemetryMutationOptions(options));
+};

@@ -6,11 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type DirectiveStatus = typeof DirectiveStatus[keyof typeof DirectiveStatus];
-
+export type DirectiveStatus =
+  (typeof DirectiveStatus)[keyof typeof DirectiveStatus];
 
 export const DirectiveStatus = {
-  executing: 'executing',
-  monitoring: 'monitoring',
-  resolved: 'resolved',
+  executing: "executing",
+  monitoring: "monitoring",
+  resolved: "resolved",
 } as const;

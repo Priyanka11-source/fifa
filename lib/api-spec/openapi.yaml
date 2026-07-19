@@ -237,7 +237,15 @@ components:
           type: string
         category:
           type: string
-          enum: [crowd, accessibility, transport, sustainability, security, ticketing]
+          enum:
+            [
+              crowd,
+              accessibility,
+              transport,
+              sustainability,
+              security,
+              ticketing,
+            ]
         severity:
           type: string
           enum: [info, watch, critical]
@@ -304,7 +312,8 @@ components:
           type: number
         activeIncident:
           type: string
-          enum: [none, storm, transit_disruption, crowd_surge, grid_failure, manual]
+          enum:
+            [none, storm, transit_disruption, crowd_surge, grid_failure, manual]
         gates:
           type: array
           items:
@@ -328,5 +337,3 @@ components:
                 type: string
                 enum: [normal, delayed, disrupted]
             required: [name, etaMinutes, status]
-
-

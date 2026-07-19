@@ -5,7 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { SimulateIncidentBodyType } from './simulateIncidentBodyType';
+import type { SimulateIncidentBodyType } from "./simulateIncidentBodyType";
 
 export interface SimulateIncidentBody {
   type: SimulateIncidentBodyType;

@@ -5,9 +5,9 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { DirectiveCategory } from './directiveCategory';
-import type { DirectiveSeverity } from './directiveSeverity';
-import type { DirectiveStatus } from './directiveStatus';
+import type { DirectiveCategory } from "./directiveCategory";
+import type { DirectiveSeverity } from "./directiveSeverity";
+import type { DirectiveStatus } from "./directiveStatus";
 
 export interface Directive {
   id: string;

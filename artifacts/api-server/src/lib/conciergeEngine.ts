@@ -2,11 +2,7 @@ import type { OperationalStateSnapshot } from "./operationsState";
 
 export type LanguageCode = "en" | "es" | "fr" | "pt" | "ja" | "ar";
 export type ConciergeCategory =
-  | "navigation"
-  | "accessibility"
-  | "transportation"
-  | "ticketing"
-  | "general";
+  "navigation" | "accessibility" | "transportation" | "ticketing" | "general";
 
 const LANGUAGE_NAMES: Record<LanguageCode, string> = {
   en: "English",
@@ -18,17 +14,61 @@ const LANGUAGE_NAMES: Record<LanguageCode, string> = {
 };
 
 const LANGUAGE_MARKERS: Record<Exclude<LanguageCode, "ja" | "ar">, string[]> = {
-  en: ["where", "is", "the", "gate", "section", "please", "thanks", "how", "ticket"],
-  es: ["dónde", "donde", "está", "esta", "puerta", "sección", "gracias", "por favor", "más rápida", "boleto", "entrada"],
-  fr: ["où", "est", "porte", "section", "merci", "s'il vous plaît", "billet", "rapide"],
-  pt: ["onde", "está", "esta", "portão", "seção", "obrigado", "ingresso", "bilhete", "rápida"],
+  en: [
+    "where",
+    "is",
+    "the",
+    "gate",
+    "section",
+    "please",
+    "thanks",
+    "how",
+    "ticket",
+  ],
+  es: [
+    "dónde",
+    "donde",
+    "está",
+    "esta",
+    "puerta",
+    "sección",
+    "gracias",
+    "por favor",
+    "más rápida",
+    "boleto",
+    "entrada",
+  ],
+  fr: [
+    "où",
+    "est",
+    "porte",
+    "section",
+    "merci",
+    "s'il vous plaît",
+    "billet",
+    "rapide",
+  ],
+  pt: [
+    "onde",
+    "está",
+    "esta",
+    "portão",
+    "seção",
+    "obrigado",
+    "ingresso",
+    "bilhete",
+    "rápida",
+  ],
 };
 
 function normalize(message: string): string {
   return message.toLowerCase();
 }
 
-export function detectLanguage(message: string): { code: LanguageCode; name: string } {
+export function detectLanguage(message: string): {
+  code: LanguageCode;
+  name: string;
+} {
   if (/[\u3040-\u30ff\u4e00-\u9fff]/.test(message)) {
     return { code: "ja", name: LANGUAGE_NAMES.ja };
   }
@@ -74,43 +114,117 @@ export function detectLanguage(message: string): { code: LanguageCode; name: str
 
 const CATEGORY_KEYWORDS: Record<ConciergeCategory, string[]> = {
   navigation: [
-    "gate", "entrance", "section", "seat", "where is", "way to",
-    "puerta", "entrada", "sección", "asiento", "dónde", "donde",
-    "porte", "où", "billete de entrada", "assento",
-    "portão", "seção", "onde",
-    "ゲート", "入口", "席", "どこ",
-    "بوابة", "مدخل", "مقعد", "أين",
+    "gate",
+    "entrance",
+    "section",
+    "seat",
+    "where is",
+    "way to",
+    "puerta",
+    "entrada",
+    "sección",
+    "asiento",
+    "dónde",
+    "donde",
+    "porte",
+    "où",
+    "billete de entrada",
+    "assento",
+    "portão",
+    "seção",
+    "onde",
+    "ゲート",
+    "入口",
+    "席",
+    "どこ",
+    "بوابة",
+    "مدخل",
+    "مقعد",
+    "أين",
   ],
   accessibility: [
-    "wheelchair", "accessible", "disability", "ramp",
-    "silla de ruedas", "accesible", "discapacidad", "rampa",
-    "fauteuil roulant", "handicap", "rampe",
-    "cadeira de rodas", "acessível", "deficiência",
-    "車椅子", "バリアフリー", "障害",
-    "كرسي متحرك", "إعاقة",
+    "wheelchair",
+    "accessible",
+    "disability",
+    "ramp",
+    "silla de ruedas",
+    "accesible",
+    "discapacidad",
+    "rampa",
+    "fauteuil roulant",
+    "handicap",
+    "rampe",
+    "cadeira de rodas",
+    "acessível",
+    "deficiência",
+    "車椅子",
+    "バリアフリー",
+    "障害",
+    "كرسي متحرك",
+    "إعاقة",
   ],
   transportation: [
-    "shuttle", "metro", "train", "parking", "bus", "ride",
-    "autobús", "autobus", "metro", "tren", "estacionamiento", "transporte",
-    "navette", "métro", "parking",
-    "ônibus", "onibus", "metrô", "trem", "estacionamento",
-    "シャトル", "電車", "駐車場", "バス",
-    "حافلة", "مترو", "وقوف السيارات",
+    "shuttle",
+    "metro",
+    "train",
+    "parking",
+    "bus",
+    "ride",
+    "autobús",
+    "autobus",
+    "metro",
+    "tren",
+    "estacionamiento",
+    "transporte",
+    "navette",
+    "métro",
+    "parking",
+    "ônibus",
+    "onibus",
+    "metrô",
+    "trem",
+    "estacionamento",
+    "シャトル",
+    "電車",
+    "駐車場",
+    "バス",
+    "حافلة",
+    "مترو",
+    "وقوف السيارات",
   ],
   ticketing: [
-    "ticket", "qr", "lost", "refund",
-    "boleto", "perdido", "reembolso",
-    "billet", "perdu", "remboursement",
-    "bilhete", "ingresso", "perdido", "reembolso",
-    "チケット", "紛失", "払い戻し",
-    "تذكرة", "فقدت", "استرداد",
+    "ticket",
+    "qr",
+    "lost",
+    "refund",
+    "boleto",
+    "perdido",
+    "reembolso",
+    "billet",
+    "perdu",
+    "remboursement",
+    "bilhete",
+    "ingresso",
+    "perdido",
+    "reembolso",
+    "チケット",
+    "紛失",
+    "払い戻し",
+    "تذكرة",
+    "فقدت",
+    "استرداد",
   ],
   general: [],
 };
 
 export function detectCategory(message: string): ConciergeCategory {
   const normalized = normalize(message);
-  for (const category of ["accessibility", "transportation", "ticketing", "navigation"] as const) {
+  for (const category of [
+    "accessibility",
+    "transportation",
+    "ticketing",
+    "navigation",
+  ] as const) {
     if (CATEGORY_KEYWORDS[category].some((kw) => normalized.includes(kw))) {
       return category;
     }
@@ -120,7 +234,8 @@ export function detectCategory(message: string): ConciergeCategory {
 
 const TRANSLATED_MESSAGE_SUMMARY: Record<ConciergeCategory, string> = {
   navigation: "Fan is asking for directions to a gate, section, or seat.",
-  accessibility: "Fan is asking about wheelchair access or accessibility accommodations.",
+  accessibility:
+    "Fan is asking about wheelchair access or accessibility accommodations.",
   transportation: "Fan is asking about shuttle, metro, or parking options.",
   ticketing: "Fan is asking about a ticket, QR code, or refund issue.",
   general: "Fan sent a general greeting or open-ended question.",
@@ -147,7 +262,10 @@ interface ReplyPair {
   replyTranslation: string;
 }
 
-function buildEnglishReply(category: ConciergeCategory, state: OperationalStateSnapshot): string {
+function buildEnglishReply(
+  category: ConciergeCategory,
+  state: OperationalStateSnapshot,
+): string {
   switch (category) {
     case "navigation": {
       const gate = quietestGate(state);
@@ -173,7 +291,10 @@ function buildEnglishReply(category: ConciergeCategory, state: OperationalStateS
 }
 
 const REPLY_BUILDERS: Partial<
-  Record<Exclude<LanguageCode, "en">, (category: ConciergeCategory, state: OperationalStateSnapshot) => string>
+  Record<
+    Exclude<LanguageCode, "en">,
+    (category: ConciergeCategory, state: OperationalStateSnapshot) => string
+  >
 > = {
   es: (category, state) => {
     switch (category) {

@@ -6,13 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type OperationalStateActiveIncident = typeof OperationalStateActiveIncident[keyof typeof OperationalStateActiveIncident];
-
+export type OperationalStateActiveIncident =
+  (typeof OperationalStateActiveIncident)[keyof typeof OperationalStateActiveIncident];
 
 export const OperationalStateActiveIncident = {
-  none: 'none',
-  storm: 'storm',
-  transit_disruption: 'transit_disruption',
-  crowd_surge: 'crowd_surge',
-  grid_failure: 'grid_failure',
+  none: "none",
+  storm: "storm",
+  transit_disruption: "transit_disruption",
+  crowd_surge: "crowd_surge",
+  grid_failure: "grid_failure",
 } as const;

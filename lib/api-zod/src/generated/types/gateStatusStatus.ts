@@ -6,12 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GateStatusStatus = typeof GateStatusStatus[keyof typeof GateStatusStatus];
-
+export type GateStatusStatus =
+  (typeof GateStatusStatus)[keyof typeof GateStatusStatus];
 
 export const GateStatusStatus = {
-  clear: 'clear',
-  moderate: 'moderate',
-  congested: 'congested',
-  critical: 'critical',
+  clear: "clear",
+  moderate: "moderate",
+  congested: "congested",
+  critical: "critical",
 } as const;

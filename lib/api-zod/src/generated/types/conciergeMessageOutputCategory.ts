@@ -6,13 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ConciergeMessageOutputCategory = typeof ConciergeMessageOutputCategory[keyof typeof ConciergeMessageOutputCategory];
-
+export type ConciergeMessageOutputCategory =
+  (typeof ConciergeMessageOutputCategory)[keyof typeof ConciergeMessageOutputCategory];
 
 export const ConciergeMessageOutputCategory = {
-  navigation: 'navigation',
-  accessibility: 'accessibility',
-  transportation: 'transportation',
-  ticketing: 'ticketing',
-  general: 'general',
+  navigation: "navigation",
+  accessibility: "accessibility",
+  transportation: "transportation",
+  ticketing: "ticketing",
+  general: "general",
 } as const;

@@ -45,7 +45,9 @@ function crowdSeverity(pct: number): DirectiveSeverity {
  * urgent signals, and emit specific, actionable directives grounded in real
  * numbers rather than generic filler.
  */
-export function buildOperationsBrief(state: OperationalStateSnapshot): OperationsBriefResult {
+export function buildOperationsBrief(
+  state: OperationalStateSnapshot,
+): OperationsBriefResult {
   const directives: Directive[] = [];
 
   const sortedGates = [...state.gates].sort((a, b) => b.crowdPct - a.crowdPct);
@@ -59,95 +61,105 @@ export function buildOperationsBrief(state: OperationalStateSnapshot): Operation
       directives.push({
         id: nextId("security"),
         title: "Severe weather warning: Seek shelter",
-        detail: "Lightning detected within 5 miles. Directing fans to main concourse shelters. High-elevation walkways closed for safety.",
+        detail:
+          "Lightning detected within 5 miles. Directing fans to main concourse shelters. High-elevation walkways closed for safety.",
         category: "security",
         severity: "critical",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextId("transport"),
         title: "Reroute shuttle loop transit",
-        detail: "Severe rain starting. Diverting active parking shuttles to covered lower terminal to safeguard volunteers and fans.",
+        detail:
+          "Severe rain starting. Diverting active parking shuttles to covered lower terminal to safeguard volunteers and fans.",
         category: "transport",
         severity: "watch",
         gate: "gate-4",
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextId("sustainability"),
         title: "Power grid load-shedding active",
-        detail: "Grid load at 88%. Concourse lighting dimmed by 30% and outdoor digital displays shifted to low-power emergency mode.",
+        detail:
+          "Grid load at 88%. Concourse lighting dimmed by 30% and outdoor digital displays shifted to low-power emergency mode.",
         category: "sustainability",
         severity: "watch",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
     } else if (state.activeIncident === "transit_disruption") {
       directives.push({
         id: nextId("transport"),
         title: "Metro Gold Line outage: Service suspended",
-        detail: "Signal failure on Gold Line. Activating backup shuttle loops between West Plaza and Downtown station. Delay ETA 25 min.",
+        detail:
+          "Signal failure on Gold Line. Activating backup shuttle loops between West Plaza and Downtown station. Delay ETA 25 min.",
         category: "transport",
         severity: "critical",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextId("crowd"),
         title: "Divert outbound flows to Rideshare Zone",
-        detail: "Metro disruption will cause heavy post-match delays. Dynamic signs rerouting departing fans toward Rideshare Zone B.",
+        detail:
+          "Metro disruption will cause heavy post-match delays. Dynamic signs rerouting departing fans toward Rideshare Zone B.",
         category: "crowd",
         severity: "watch",
         gate: "gate-4",
-        status: "executing"
+        status: "executing",
       });
     } else if (state.activeIncident === "crowd_surge") {
       directives.push({
         id: nextId("crowd"),
         title: "Gate 4 & Gate 14 surge: Open overflows",
-        detail: "Concourse ingress pressure exceeded 90%. Opening emergency gates 4B and 14B to double entry lane throughput.",
+        detail:
+          "Concourse ingress pressure exceeded 90%. Opening emergency gates 4B and 14B to double entry lane throughput.",
         category: "crowd",
         severity: "critical",
         gate: "gate-4",
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextId("security"),
         title: "Deploy crowd volunteers to West Plaza",
-        detail: "Deploying 15 additional safety stewards to Gate 4 concourse corridor to assist with line forming and ticket scans.",
+        detail:
+          "Deploying 15 additional safety stewards to Gate 4 concourse corridor to assist with line forming and ticket scans.",
         category: "security",
         severity: "watch",
         gate: "gate-4",
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextId("ticketing"),
         title: "Redirect mobile ticket support",
-        detail: "Congestion at Gate 14. Setting up mobile ticket desk 6 to intercept fans with QR scan issues before they block lanes.",
+        detail:
+          "Congestion at Gate 14. Setting up mobile ticket desk 6 to intercept fans with QR scan issues before they block lanes.",
         category: "ticketing",
         severity: "info",
         gate: "gate-14",
-        status: "executing"
+        status: "executing",
       });
     } else if (state.activeIncident === "grid_failure") {
       directives.push({
         id: nextId("sustainability"),
         title: "Grid substation failure: Backup active",
-        detail: "Primary power lost. Auxiliary diesel generator banks 1 and 2 started. Critical pitch illumination and safety systems online.",
+        detail:
+          "Primary power lost. Auxiliary diesel generator banks 1 and 2 started. Critical pitch illumination and safety systems online.",
         category: "sustainability",
         severity: "critical",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
       directives.push({
         id: nextId("sustainability"),
         title: "Concourse HVAC reduced to 50%",
-        detail: "Load-shedding active. HVAC offline in low-occupancy service areas. Advise venue staff to keep gates open for cross-ventilation.",
+        detail:
+          "Load-shedding active. HVAC offline in low-occupancy service areas. Advise venue staff to keep gates open for cross-ventilation.",
         category: "sustainability",
         severity: "watch",
         gate: null,
-        status: "executing"
+        status: "executing",
       });
     }
   }
@@ -157,8 +169,8 @@ export function buildOperationsBrief(state: OperationalStateSnapshot): Operation
     for (const gate of congested) {
       if (directives.length >= 5) break;
       // Skip if this gate is already covered in active incident
-      if (directives.some(d => d.gate === gate.id)) continue;
-      
+      if (directives.some((d) => d.gate === gate.id)) continue;
+
       directives.push({
         id: nextId("crowd"),
         title: `Reroute foot traffic — ${gate.name}`,
@@ -188,12 +200,14 @@ export function buildOperationsBrief(state: OperationalStateSnapshot): Operation
     });
   }
 
-  const disruptedTransport = state.transport.filter((t) => t.status !== "normal");
+  const disruptedTransport = state.transport.filter(
+    (t) => t.status !== "normal",
+  );
   if (directives.length < 5) {
     for (const line of disruptedTransport) {
       if (directives.length >= 5) break;
-      if (directives.some(d => d.title.includes(line.name))) continue;
-      
+      if (directives.some((d) => d.title.includes(line.name))) continue;
+
       directives.push({
         id: nextId("transport"),
         title: `${line.status === "disrupted" ? "Disruption" : "Delay"} on ${line.name}`,
@@ -218,8 +232,14 @@ export function buildOperationsBrief(state: OperationalStateSnapshot): Operation
     });
   }
 
-  const severityRank: Record<DirectiveSeverity, number> = { critical: 0, watch: 1, info: 2 };
-  directives.sort((a, b) => severityRank[a.severity] - severityRank[b.severity]);
+  const severityRank: Record<DirectiveSeverity, number> = {
+    critical: 0,
+    watch: 1,
+    info: 2,
+  };
+  directives.sort(
+    (a, b) => severityRank[a.severity] - severityRank[b.severity],
+  );
 
   let summary = "";
   if (state.activeIncident && state.activeIncident !== "none") {

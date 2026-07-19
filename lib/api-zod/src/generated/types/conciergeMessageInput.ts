@@ -8,8 +8,8 @@
 
 export interface ConciergeMessageInput {
   /**
-     * @minLength 1
-     * @maxLength 500
-     */
+   * @minLength 1
+   * @maxLength 500
+   */
   message: string;
 }

@@ -5,9 +5,9 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { UpdateCustomTelemetryBodyActiveIncident } from './updateCustomTelemetryBodyActiveIncident';
-import type { UpdateCustomTelemetryBodyGatesItem } from './updateCustomTelemetryBodyGatesItem';
-import type { UpdateCustomTelemetryBodyTransportItem } from './updateCustomTelemetryBodyTransportItem';
+import type { UpdateCustomTelemetryBodyActiveIncident } from "./updateCustomTelemetryBodyActiveIncident";
+import type { UpdateCustomTelemetryBodyGatesItem } from "./updateCustomTelemetryBodyGatesItem";
+import type { UpdateCustomTelemetryBodyTransportItem } from "./updateCustomTelemetryBodyTransportItem";
 
 export interface UpdateCustomTelemetryBody {
   weatherCondition?: string;

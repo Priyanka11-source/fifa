@@ -5,83 +5,102 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import * as zod from 'zod';
-
+import * as zod from "zod";
 
 /**
  * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
-  "status": zod.string()
-})
-
+  status: zod.string(),
+});
 
 /**
  * Returns current simulated gate crowd levels, transport status, weather, and energy load. Values drift slightly on every call to simulate live sensor telemetry.
  * @summary Get live simulated stadium operational state
  */
 export const GetOperationsStateResponse = zod.object({
-  "timestamp": zod.coerce.date(),
-  "weatherCondition": zod.string(),
-  "energyLoadPct": zod.number(),
-  "crowdCount": zod.number(),
-  "activeIncident": zod.enum(['none', 'storm', 'transit_disruption', 'crowd_surge', 'grid_failure']),
-  "gates": zod.array(zod.object({
-  "id": zod.string(),
-  "name": zod.string(),
-  "crowdPct": zod.number(),
-  "status": zod.enum(['clear', 'moderate', 'congested', 'critical'])
-})),
-  "transport": zod.array(zod.object({
-  "name": zod.string(),
-  "mode": zod.enum(['rail', 'shuttle', 'rideshare', 'parking']),
-  "status": zod.enum(['normal', 'delayed', 'disrupted']),
-  "etaMinutes": zod.number()
-}))
-})
-
+  timestamp: zod.coerce.date(),
+  weatherCondition: zod.string(),
+  energyLoadPct: zod.number(),
+  crowdCount: zod.number(),
+  activeIncident: zod.enum([
+    "none",
+    "storm",
+    "transit_disruption",
+    "crowd_surge",
+    "grid_failure",
+  ]),
+  gates: zod.array(
+    zod.object({
+      id: zod.string(),
+      name: zod.string(),
+      crowdPct: zod.number(),
+      status: zod.enum(["clear", "moderate", "congested", "critical"]),
+    }),
+  ),
+  transport: zod.array(
+    zod.object({
+      name: zod.string(),
+      mode: zod.enum(["rail", "shuttle", "rideshare", "parking"]),
+      status: zod.enum(["normal", "delayed", "disrupted"]),
+      etaMinutes: zod.number(),
+    }),
+  ),
+});
 
 /**
  * Sends the current simulated operational state to a GenAI model and returns a structured set of prioritized operational directives (crowd, accessibility, transport, sustainability, security) plus a short human-readable summary.
  * @summary Generate a GenAI operational intelligence brief from the current live state
  */
 export const GenerateOperationsBriefResponse = zod.object({
-  "summary": zod.string(),
-  "generatedAt": zod.coerce.date(),
-  "directives": zod.array(zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "detail": zod.string(),
-  "category": zod.enum(['crowd', 'accessibility', 'transport', 'sustainability', 'security', 'ticketing']),
-  "severity": zod.enum(['info', 'watch', 'critical']),
-  "gate": zod.string().nullable(),
-  "status": zod.enum(['executing', 'monitoring', 'resolved'])
-}))
-})
-
+  summary: zod.string(),
+  generatedAt: zod.coerce.date(),
+  directives: zod.array(
+    zod.object({
+      id: zod.string(),
+      title: zod.string(),
+      detail: zod.string(),
+      category: zod.enum([
+        "crowd",
+        "accessibility",
+        "transport",
+        "sustainability",
+        "security",
+        "ticketing",
+      ]),
+      severity: zod.enum(["info", "watch", "critical"]),
+      gate: zod.string().nullable(),
+      status: zod.enum(["executing", "monitoring", "resolved"]),
+    }),
+  ),
+});
 
 /**
  * Sets the active simulated incident, which overrides the live telemetry and shifts the stadium into emergency operational state.
  * @summary Simulate a stadium incident
  */
 export const SimulateIncidentBody = zod.object({
-  "type": zod.enum(['none', 'storm', 'transit_disruption', 'crowd_surge', 'grid_failure'])
-})
+  type: zod.enum([
+    "none",
+    "storm",
+    "transit_disruption",
+    "crowd_surge",
+    "grid_failure",
+  ]),
+});
 
 export const SimulateIncidentResponse = zod.object({
-  "status": zod.string()
-})
-
+  status: zod.string(),
+});
 
 /**
  * Clears any active incident and restores normal simulated operations.
  * @summary Reset stadium simulation
  */
 export const ResetIncidentResponse = zod.object({
-  "status": zod.string()
-})
-
+  status: zod.string(),
+});
 
 /**
  * Detects the input language, translates it to English, classifies the intent (navigation, accessibility, transportation, ticketing, general), and returns a helpful concierge reply in the fan's original language plus an English translation of that reply.
@@ -89,42 +108,60 @@ export const ResetIncidentResponse = zod.object({
  */
 export const sendConciergeMessageBodyMessageMax = 500;
 
-
-
 export const SendConciergeMessageBody = zod.object({
-  "message": zod.string().min(1).max(sendConciergeMessageBodyMessageMax)
-})
+  message: zod.string().min(1).max(sendConciergeMessageBodyMessageMax),
+});
 
 export const SendConciergeMessageResponse = zod.object({
-  "detectedLanguage": zod.string(),
-  "translatedMessage": zod.string(),
-  "reply": zod.string(),
-  "replyTranslation": zod.string(),
-  "category": zod.enum(['navigation', 'accessibility', 'transportation', 'ticketing', 'general'])
-})
-
+  detectedLanguage: zod.string(),
+  translatedMessage: zod.string(),
+  reply: zod.string(),
+  replyTranslation: zod.string(),
+  category: zod.enum([
+    "navigation",
+    "accessibility",
+    "transportation",
+    "ticketing",
+    "general",
+  ]),
+});
 
 /**
  * Updates the simulated stadium state parameters manually. This shifts the active incident status to 'manual' and freezes automated drift updates.
  * @summary Update custom simulated stadium operational state (manual entry)
  */
 export const UpdateCustomTelemetryBody = zod.object({
-  "weatherCondition": zod.string().optional(),
-  "energyLoadPct": zod.number().optional(),
-  "activeIncident": zod.enum(['none', 'storm', 'transit_disruption', 'crowd_surge', 'grid_failure', 'manual']).optional(),
-  "gates": zod.array(zod.object({
-  "id": zod.string(),
-  "crowdPct": zod.number()
-})).optional(),
-  "transport": zod.array(zod.object({
-  "name": zod.string(),
-  "etaMinutes": zod.number(),
-  "status": zod.enum(['normal', 'delayed', 'disrupted'])
-})).optional()
-})
+  weatherCondition: zod.string().optional(),
+  energyLoadPct: zod.number().optional(),
+  activeIncident: zod
+    .enum([
+      "none",
+      "storm",
+      "transit_disruption",
+      "crowd_surge",
+      "grid_failure",
+      "manual",
+    ])
+    .optional(),
+  gates: zod
+    .array(
+      zod.object({
+        id: zod.string(),
+        crowdPct: zod.number(),
+      }),
+    )
+    .optional(),
+  transport: zod
+    .array(
+      zod.object({
+        name: zod.string(),
+        etaMinutes: zod.number(),
+        status: zod.enum(["normal", "delayed", "disrupted"]),
+      }),
+    )
+    .optional(),
+});
 
 export const UpdateCustomTelemetryResponse = zod.object({
-  "status": zod.string()
-})
-
-
+  status: zod.string(),
+});
