@@ -7,6 +7,7 @@ import {
   getGetOperationsStateQueryKey,
   useSimulateIncident,
   useResetIncident,
+  useUpdateCustomTelemetry,
 } from '@workspace/api-client-react';
 import type { Directive } from '@workspace/api-client-react';
 import { ShieldAlert, RefreshCw, AlertTriangle, CloudRain, ShieldCheck, Zap, Users, Train, Sliders, Check } from 'lucide-react';
@@ -40,6 +41,7 @@ export default function CommandCenter() {
   
   const { mutate: simulateIncident, isPending: isSimulating } = useSimulateIncident();
   const { mutate: resetIncident, isPending: isResetting } = useResetIncident();
+  const { mutate: updateCustomTelemetry } = useUpdateCustomTelemetry();
   
   const [directives, setDirectives] = useState<Directive[]>([]);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
@@ -88,29 +90,29 @@ export default function CommandCenter() {
   async function handleCustomSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsUpdating(true);
-    try {
-      const baseUrl = import.meta.env.DEV ? "http://localhost:5000" : "";
-      const response = await fetch(`${baseUrl}/api/genai/operations/custom`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+    updateCustomTelemetry(
+      {
+        data: {
           weatherCondition: customWeather,
           energyLoadPct: Number(customEnergy),
           activeIncident: "manual",
           gates: Object.entries(customGates).map(([id, crowdPct]) => ({ id, crowdPct: Number(crowdPct) }))
-        })
-      });
-      if (response.ok) {
-        queryClient.invalidateQueries();
-        refetchState();
-        generateBrief();
-        setIsEditorOpen(false);
+        }
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries();
+          refetchState();
+          generateBrief();
+          setIsEditorOpen(false);
+          setIsUpdating(false);
+        },
+        onError: (err) => {
+          console.error("Failed to update custom telemetry", err);
+          setIsUpdating(false);
+        }
       }
-    } catch (err) {
-      console.error("Failed to update custom telemetry", err);
-    } finally {
-      setIsUpdating(false);
-    }
+    );
   }
 
   function handleSimulate(type: 'storm' | 'transit_disruption' | 'crowd_surge' | 'grid_failure') {

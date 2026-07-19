@@ -161,6 +161,7 @@ export default function Home() {
             <button
               onClick={() => setAccessibility(prev => ({ ...prev, largeText: !prev.largeText }))}
               title="Toggle Large Text"
+              aria-label="Toggle Large Text"
               className={`p-2.5 border rounded-sm transition-all ${
                 accessibility.largeText
                   ? 'bg-primary/15 border-primary text-primary shadow-[0_0_10px_rgba(212,175,55,0.15)]'
@@ -174,6 +175,7 @@ export default function Home() {
             <button
               onClick={() => setAccessibility(prev => ({ ...prev, highContrast: !prev.highContrast }))}
               title="Toggle High Contrast"
+              aria-label="Toggle High Contrast"
               className={`p-2.5 border rounded-sm transition-all ${
                 accessibility.highContrast
                   ? 'bg-primary/15 border-primary text-primary shadow-[0_0_10px_rgba(212,175,55,0.15)]'

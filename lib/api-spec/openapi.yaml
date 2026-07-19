@@ -129,6 +129,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GenaiError"
+  /genai/operations/custom:
+    post:
+      operationId: updateCustomTelemetry
+      tags: [genai]
+      summary: Update custom simulated stadium operational state (manual entry)
+      description: Updates the simulated stadium state parameters manually. This shifts the active incident status to 'manual' and freezes automated drift updates.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCustomTelemetryBody"
+      responses:
+        "200":
+          description: State updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required: [status]
 components:
   schemas:
     HealthStatus:
@@ -272,4 +295,38 @@ components:
           type: string
           enum: [none, storm, transit_disruption, crowd_surge, grid_failure]
       required: [type]
+    UpdateCustomTelemetryBody:
+      type: object
+      properties:
+        weatherCondition:
+          type: string
+        energyLoadPct:
+          type: number
+        activeIncident:
+          type: string
+          enum: [none, storm, transit_disruption, crowd_surge, grid_failure, manual]
+        gates:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              crowdPct:
+                type: number
+            required: [id, crowdPct]
+        transport:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              etaMinutes:
+                type: integer
+              status:
+                type: string
+                enum: [normal, delayed, disrupted]
+            required: [name, etaMinutes, status]
+
 

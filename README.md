@@ -2,7 +2,7 @@
 
 A visionary, cinematic, and GenAI-powered Smart Stadium Operations & Fan Assistance platform built for the 2026 FIFA World Cup. This application fuses cutting-edge generative AI capabilities with a breathtaking "Golden Era" cinematic sports aesthetic.
 
-⚡ **Live Demo on Vercel**: [https://fifa-stadium-amber.vercel.app](https://fifa-stadium-amber.vercel.app)
+⚡ **Live Demo on Vercel**: [https://fifa-stadium-bqbo886zq-priyanka-priyadarsini-bej-s-projects.vercel.app](https://fifa-stadium-bqbo886zq-priyanka-priyadarsini-bej-s-projects.vercel.app)
 
 ## 🏆 Chosen Vertical
 * **Vertical**: **Sports Tech, Venue Management, & Fan Hospitality**

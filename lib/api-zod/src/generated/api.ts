@@ -104,3 +104,27 @@ export const SendConciergeMessageResponse = zod.object({
 })
 
 
+/**
+ * Updates the simulated stadium state parameters manually. This shifts the active incident status to 'manual' and freezes automated drift updates.
+ * @summary Update custom simulated stadium operational state (manual entry)
+ */
+export const UpdateCustomTelemetryBody = zod.object({
+  "weatherCondition": zod.string().optional(),
+  "energyLoadPct": zod.number().optional(),
+  "activeIncident": zod.enum(['none', 'storm', 'transit_disruption', 'crowd_surge', 'grid_failure', 'manual']).optional(),
+  "gates": zod.array(zod.object({
+  "id": zod.string(),
+  "crowdPct": zod.number()
+})).optional(),
+  "transport": zod.array(zod.object({
+  "name": zod.string(),
+  "etaMinutes": zod.number(),
+  "status": zod.enum(['normal', 'delayed', 'disrupted'])
+})).optional()
+})
+
+export const UpdateCustomTelemetryResponse = zod.object({
+  "status": zod.string()
+})
+
+

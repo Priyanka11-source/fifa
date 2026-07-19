@@ -452,6 +452,7 @@ export default function AudienceExperience() {
                   autoPlay 
                   playsInline 
                   muted 
+                  aria-label="Webcam feed for ticket scanning"
                   className={`absolute inset-0 w-full h-full object-cover z-0 ${useSimulator ? 'opacity-0' : 'opacity-70'}`}
                 />
 

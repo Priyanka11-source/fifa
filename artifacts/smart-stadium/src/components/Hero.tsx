@@ -24,6 +24,8 @@ export default function Hero({ onDeployCommand, onViewDirectives }: HeroProps) {
           muted 
           loop 
           playsInline
+          aria-hidden="true"
+          tabIndex={-1}
           className="object-cover w-full h-full scale-105"
         >
           <source src="/videos/stadium-hero-1.mp4" type="video/mp4" />

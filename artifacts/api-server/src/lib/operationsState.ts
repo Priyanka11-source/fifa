@@ -28,7 +28,7 @@ export interface OperationalStateSnapshot {
 
 const WEATHER_CONDITIONS = ["Clear", "Overcast", "Light Rain", "Humid", "Windy"];
 
-export type IncidentType = "none" | "storm" | "transit_disruption" | "crowd_surge" | "grid_failure";
+export type IncidentType = "none" | "storm" | "transit_disruption" | "crowd_surge" | "grid_failure" | "manual";
 let activeIncident: IncidentType = "none";
 let isManualOverride = false;
 

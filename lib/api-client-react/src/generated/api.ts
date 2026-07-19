@@ -28,7 +28,9 @@ import type {
   OperationsBrief,
   ResetIncident200,
   SimulateIncident200,
-  SimulateIncidentBody
+  SimulateIncidentBody,
+  UpdateCustomTelemetry200,
+  UpdateCustomTelemetryBody
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -500,5 +502,77 @@ export const useSendConciergeMessage = <TError = ErrorType<GenaiError>,
         TContext
       > => {
       return useMutation(getSendConciergeMessageMutationOptions(options));
+    }
+
+export const getUpdateCustomTelemetryUrl = () => {
+
+
+
+
+  return `/api/genai/operations/custom`
+}
+
+/**
+ * Updates the simulated stadium state parameters manually. This shifts the active incident status to 'manual' and freezes automated drift updates.
+ * @summary Update custom simulated stadium operational state (manual entry)
+ */
+export const updateCustomTelemetry = async (updateCustomTelemetryBody: UpdateCustomTelemetryBody, options?: RequestInit): Promise<UpdateCustomTelemetry200> => {
+
+  return customFetch<UpdateCustomTelemetry200>(getUpdateCustomTelemetryUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateCustomTelemetryBody)
+  }
+);}
+
+
+
+
+
+export const getUpdateCustomTelemetryMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCustomTelemetry>>, TError,{data: BodyType<UpdateCustomTelemetryBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCustomTelemetry>>, TError,{data: BodyType<UpdateCustomTelemetryBody>}, TContext> => {
+
+const mutationKey = ['updateCustomTelemetry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCustomTelemetry>>, {data: BodyType<UpdateCustomTelemetryBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateCustomTelemetry(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCustomTelemetryMutationResult = NonNullable<Awaited<ReturnType<typeof updateCustomTelemetry>>>
+    export type UpdateCustomTelemetryMutationBody = BodyType<UpdateCustomTelemetryBody>
+    export type UpdateCustomTelemetryMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update custom simulated stadium operational state (manual entry)
+ */
+export const useUpdateCustomTelemetry = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCustomTelemetry>>, TError,{data: BodyType<UpdateCustomTelemetryBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateCustomTelemetry>>,
+        TError,
+        {data: BodyType<UpdateCustomTelemetryBody>},
+        TContext
+      > => {
+      return useMutation(getUpdateCustomTelemetryMutationOptions(options));
     }
 

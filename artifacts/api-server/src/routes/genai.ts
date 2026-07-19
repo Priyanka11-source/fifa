@@ -4,6 +4,7 @@ import {
   GenerateOperationsBriefResponse,
   SendConciergeMessageBody,
   SendConciergeMessageResponse,
+  UpdateCustomTelemetryBody,
 } from "@workspace/api-zod";
 import { getOperationalState, setActiveIncident, resetActiveIncident, updateOperationalState, type IncidentType } from "../lib/operationsState";
 import { buildOperationsBrief } from "../lib/operationsBrief";
@@ -58,8 +59,14 @@ router.post("/genai/operations/reset", (req, res): void => {
 });
 
 router.post("/genai/operations/custom", (req, res): void => {
+  const parsed = UpdateCustomTelemetryBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
   try {
-    updateOperationalState(req.body);
+    updateOperationalState(parsed.data);
     res.json({ status: "success" });
   } catch (err) {
     req.log.error({ err }, "Failed to update manual telemetry entries");

@@ -166,11 +166,55 @@ export interface SimulateIncidentBody {
   type: SimulateIncidentBodyType;
 }
 
+export type UpdateCustomTelemetryBodyActiveIncident = typeof UpdateCustomTelemetryBodyActiveIncident[keyof typeof UpdateCustomTelemetryBodyActiveIncident];
+
+
+export const UpdateCustomTelemetryBodyActiveIncident = {
+  none: 'none',
+  storm: 'storm',
+  transit_disruption: 'transit_disruption',
+  crowd_surge: 'crowd_surge',
+  grid_failure: 'grid_failure',
+  manual: 'manual',
+} as const;
+
+export type UpdateCustomTelemetryBodyGatesItem = {
+  id: string;
+  crowdPct: number;
+};
+
+export type UpdateCustomTelemetryBodyTransportItemStatus = typeof UpdateCustomTelemetryBodyTransportItemStatus[keyof typeof UpdateCustomTelemetryBodyTransportItemStatus];
+
+
+export const UpdateCustomTelemetryBodyTransportItemStatus = {
+  normal: 'normal',
+  delayed: 'delayed',
+  disrupted: 'disrupted',
+} as const;
+
+export type UpdateCustomTelemetryBodyTransportItem = {
+  name: string;
+  etaMinutes: number;
+  status: UpdateCustomTelemetryBodyTransportItemStatus;
+};
+
+export interface UpdateCustomTelemetryBody {
+  weatherCondition?: string;
+  energyLoadPct?: number;
+  activeIncident?: UpdateCustomTelemetryBodyActiveIncident;
+  gates?: UpdateCustomTelemetryBodyGatesItem[];
+  transport?: UpdateCustomTelemetryBodyTransportItem[];
+}
+
 export type SimulateIncident200 = {
   status: string;
 };
 
 export type ResetIncident200 = {
+  status: string;
+};
+
+export type UpdateCustomTelemetry200 = {
   status: string;
 };
 
